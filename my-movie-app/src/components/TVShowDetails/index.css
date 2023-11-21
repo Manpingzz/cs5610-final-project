@@ -1,0 +1,32 @@
+.tv-show-details-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 20px;
+}
+
+.tv-show-header {
+  display: flex;
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+.tv-show-poster {
+  width: 300px;
+  border-radius: 8px;
+}
+
+.tv-show-info {
+  display: flex;
+  flex-direction: column;
+  max-width: 600px;
+}
+
+.tv-show-info h1 {
+  font-size: 2rem;
+  margin-bottom: 10px;
+}
+
+.tv-show-info p {
+  margin-bottom: 10px;
+}
