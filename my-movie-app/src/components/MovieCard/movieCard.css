@@ -1,0 +1,39 @@
+.movie-card {
+  min-width: 200px;
+  margin-right: 10px;
+  width: auto;
+  background-color: white;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  border-radius: 8px;
+  overflow: hidden;
+  text-align: center;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  display: inline-block;
+  width: calc(25% - 20px); /* 四列布局，并减去间隙 */
+  margin: 10px;
+}
+
+.movie-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+}
+
+.movie-card img {
+  width: 100%;
+  height: auto;
+  display: block;
+  border-bottom: 1px solid #ddd;
+  object-fit: cover;
+}
+
+.movie-card h3 {
+  margin: 8px 0;
+  color: #333;
+  font-size: 1.2em;
+}
+
+.movie-card p {
+  color: #666;
+  font-size: 1em;
+  padding: 0 10px;
+}

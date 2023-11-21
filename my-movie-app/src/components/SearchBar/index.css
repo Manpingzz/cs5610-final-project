@@ -1,0 +1,27 @@
+.search-bar {
+  background-color: #f5f5f5;
+  padding: 20px;
+  text-align: center;
+}
+
+.search-bar form {
+  display: inline-flex;
+  width: 100%;
+  max-width: 500px;
+}
+
+.search-bar input {
+  flex: 1;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-right: none;
+}
+
+.search-bar button {
+  padding: 10px 20px;
+  background-color: rgb(200, 157, 243);
+  color: white;
+  border: none;
+  cursor: pointer;
+  border-radius: 4px;
+}

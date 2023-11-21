@@ -1,0 +1,163 @@
+.details-container {
+  display: flex;
+  padding: 20px;
+  background-color: #f4f4f4;
+  border-radius: 8px;
+}
+
+.details-content {
+  display: flex;
+  gap: 20px;
+}
+
+.details-poster img {
+  border-radius: 8px;
+  width: 342px;
+  object-fit: cover;
+}
+
+.details-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.details-info h1 {
+  font-size: 2rem;
+}
+
+.details-info h2 {
+  margin-top: 20px;
+}
+
+.details-flex-container {
+  display: flex;
+  align-items: flex-start; /* Align items to the start of the flex container */
+}
+
+.details-poster {
+  flex: 0 0 auto; /* Don't grow, don't shrink, and base the width on content */
+  margin-right: 20px; /* Add some space between poster and text */
+}
+
+.details-info {
+  flex: 1; /* Take up remaining space */
+}
+
+.cast-container {
+  margin-top: 20px;
+}
+
+.cast-member-info {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.cast-member-info img {
+  border-radius: 50%; /* Circular image */
+  margin-bottom: 10px;
+}
+
+.card-cast {
+  max-width: 100px; /* Decrease the max-width to make the card smaller */
+  margin: auto;
+}
+
+.card-img-top {
+  width: 100%;
+  height: auto;
+  object-fit: cover;
+}
+
+.card-title {
+  font-size: 0.8rem; /* Adjust font size if necessary */
+}
+
+.card-text {
+  font-size: 0.7rem; /* Adjust font size if necessary */
+}
+
+/* Ensure that the card body has padding and the text is not too cramped */
+.card-body.p-2 {
+  padding: 0.5rem; /* Adjust padding if necessary */
+}
+
+/* Horizontal Scrolling for Cast Section */
+.cast-scrolling-container {
+  overflow-x: auto; /* Enable horizontal scrolling */
+  white-space: nowrap; /* Ensure the items line up horizontally */
+  -webkit-overflow-scrolling: touch; /* Smooth scrolling on touch devices */
+}
+
+.row.flex-nowrap {
+  flex-wrap: nowrap; /* Prevent wrapping of items */
+}
+
+.card-cast {
+  display: inline-block; /* Display cards in a line */
+  width: 160px; /* Fixed width for each card */
+  white-space: normal; /* Override the white-space from the container */
+  margin-right: 15px; /* Space between cards */
+}
+
+.card-img-top {
+  width: 100%;
+  height: auto;
+  object-fit: cover;
+}
+
+.card-body {
+  padding: 0.5rem; /* Padding inside the card */
+}
+
+.card-title {
+  font-size: 0.9rem; /* Font size for actor's name */
+  margin-bottom: 0.2rem; /* Space below the actor's name */
+}
+
+.card-text {
+  font-size: 0.8rem; /* Font size for character's name */
+}
+
+.cast-scrolling-container {
+  overflow-x: auto; /* Enables horizontal scrolling */
+  white-space: nowrap; /* Keeps the cast cards on a single line */
+}
+.cast-scrolling-container::-webkit-scrollbar {
+  height: 8px;
+}
+
+.cast-scrolling-container::-webkit-scrollbar-thumb {
+  background: #888;
+}
+
+.cast-scrolling-container::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+.movie-details-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.btn {
+  padding: 10px 15px;
+  border-radius: 5px;
+  cursor: pointer;
+  border: none;
+  font-weight: bold;
+}
+
+.btn-watchlist,
+.btn-rate,
+.btn-favourite,
+.btn-trailer {
+  background-color: rgb(200, 157, 243);
+}
+
+.btn-watchlist:hover,
+.btn-rate:hover,
+.btn-favourite:hover,
+.btn-trailer:hover {
+  background-color: rgb(131, 18, 245); /* Darker shade for hover state */
+}

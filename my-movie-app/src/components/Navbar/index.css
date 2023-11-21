@@ -1,0 +1,42 @@
+.navbar-custom {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: rgb(200, 157, 243);
+  color: white;
+  padding: 0 20px;
+}
+
+.navbar-custom .navbar-brand {
+  font-size: 1.5em;
+  font-weight: bold;
+  color: white;
+}
+
+.navbar-custom .navbar-nav .nav-link {
+  color: white;
+  padding: 10px;
+}
+
+.navbar-custom .navbar-nav .nav-item {
+  margin-left: 20px;
+}
+
+/* 为折叠按钮添加自定义颜色 */
+.navbar-custom .navbar-toggler {
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+.navbar-custom .navbar-toggler-icon {
+  background-image: url("data:image/svg+xml;charset=utf8,%3Csvg viewBox='0 0 30 30' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath stroke='rgba(255, 255, 255, 0.5)' stroke-width='2' stroke-linecap='round' stroke-miterlimit='10' d='M4 7h22M4 15h22M4 23h22'/%3E%3C/svg%3E");
+}
+
+/* 当导航栏折叠在移动视图时 */
+@media (max-width: 991px) {
+  .navbar-custom .navbar-nav .nav-link {
+    color: white;
+  }
+  .navbar-custom .navbar-nav {
+    margin-left: 0;
+  }
+}
