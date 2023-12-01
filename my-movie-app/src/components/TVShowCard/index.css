@@ -35,7 +35,7 @@
 }
 
 .tv-show-card-link {
-  text-decoration: none; /* 移除下划线 */
-  color: inherit; /* 继承字体颜色 */
-  cursor: pointer; /* 鼠标悬停时显示手形图标 */
+  text-decoration: none;
+  color: inherit;
+  cursor: pointer;
 }

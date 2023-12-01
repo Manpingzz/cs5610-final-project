@@ -5,9 +5,10 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import Navbar from "./components/Navbar/Navbar";
 import SearchBar from "./components/SearchBar/SearchBar";
 import Home from "./components/Home";
-import Profile from "./components/Profile";
+import Profile from "./components/Profile/Profile";
 import Login from "./components/Login/Login";
 import Register from "./components/Register/Register";
+import ProtectedRoute from "./components/ProtectedRoute";
 import "./styles/main.css";
 import MovieDetails from "./components/MovieDetails/MovieDetails";
 import { BASE_URL, API_KEY } from "./services/movieService";
@@ -21,6 +22,7 @@ import SearchResults from "./components/SearchResults";
 import SearchBarWrapper from "./components/SearchBarWrapper";
 import PersonDetails from "./components/PersonDetails";
 import TVShowDetails from "./components/TVShowDetails/TVShowDetails";
+import { AuthProvider } from "./context/AuthContext";
 
 function App() {
   const [searchResults, setSearchResults] = useState([]);
@@ -40,40 +42,42 @@ function App() {
   };
 
   return (
-    <Router>
-      <Navbar />
-      <div className="app">
-        <SearchBarWrapper onSearch={handleSearch} />
-        <Routes>
-          <Route path="/" element={<Home searchResults={searchResults} />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-          <Route path="/profile" element={<Profile />} />
+    <AuthProvider>
+      <Router>
+        <Navbar />
+        <div className="app">
+          <SearchBarWrapper onSearch={handleSearch} />
+          <Routes>
+            <Route path="/" element={<Home searchResults={searchResults} />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
+            <Route path="/profile" element={<Profile />} />
 
-          <Route
-            path="/search"
-            element={
-              <SearchResults results={searchResults} type={searchType} />
-            }
-          />
-          <Route path="/movie/:id" element={<MovieDetails />} />
-          <Route path="/people/:id" element={<PersonDetails />} />
-          <Route path="/tv/:id" element={<TVShowDetails />} />
+            <Route
+              path="/search"
+              element={
+                <SearchResults results={searchResults} type={searchType} />
+              }
+            />
+            <Route path="/movie/:id" element={<MovieDetails />} />
+            <Route path="/people/:id" element={<PersonDetails />} />
+            <Route path="/tv/:id" element={<TVShowDetails />} />
 
-          {/* <Route
+            {/* <Route
             path="/search"
             element={
               <SearchResults results={searchResults} type={searchType} />
             }
           /> */}
-          {/* <Route path="/" element={<Home searchResults={searchResults} />} />
+            {/* <Route path="/" element={<Home searchResults={searchResults} />} />
           <Route path="/movie/:id" element={<MovieDetails />} />
           {searchResults.length > 0 && searchType === "person" && (
             <Route path="/" element={<PeopleList people={searchResults} />} />
           )} */}
-        </Routes>
-      </div>
-    </Router>
+          </Routes>
+        </div>
+      </Router>
+    </AuthProvider>
   );
 }
 

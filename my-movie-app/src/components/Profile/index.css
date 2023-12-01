@@ -1,0 +1,47 @@
+.profile-container {
+  padding: 20px;
+  max-width: 800px;
+  margin: auto;
+}
+
+.profile-section {
+  background-color: #f5f5f5;
+  padding: 20px;
+  margin-bottom: 20px;
+  border-radius: 8px;
+}
+
+.profile-section h2 {
+  margin-bottom: 10px;
+  color: #333;
+}
+
+.profile-details p {
+  margin: 5px 0;
+}
+/* 标签导航容器 */
+.profile-tabs {
+  display: flex;
+}
+
+/* 单个标签样式 */
+.profile-tab {
+  flex: 1;
+  text-align: center;
+
+  cursor: pointer;
+  color: white;
+  background-color: rgb(200, 157, 243);
+  border-end-end-radius: 4px;
+  outline: none;
+  transition: background-color 0.3s;
+}
+
+/* 激活状态的标签样式 */
+.profile-tab.active {
+  background-color: rgb(200, 157, 239);
+  color: yellow;
+}
+.btn {
+  background-color: rgb(200, 157, 243);
+}

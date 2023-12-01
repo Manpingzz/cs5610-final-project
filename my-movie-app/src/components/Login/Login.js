@@ -1,16 +1,33 @@
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useContext, useState } from "react";
+import { useNavigate, Link } from "react-router-dom";
 import "./index.css";
+import * as client from "../client.js";
+import { AuthContext } from "../../context/AuthContext.js";
 
 function Login() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState(null);
+  const { setAuth } = useContext(AuthContext);
   const navigate = useNavigate();
 
-  const handleLogin = (event) => {
+  const handleLogin = async (event) => {
     event.preventDefault();
-    // TODO: Add login logic and error handling
-    navigate("/"); // Redirect to home page on successful login
+    try {
+      const credentials = { username, password };
+      const response = await client.signin(credentials);
+      console.log("user666:", response);
+      if (response && response.token) {
+        const { user, token } = response;
+        setAuth({ user, token });
+        navigate("/");
+      } else {
+        setError("Invalid login credentials.");
+      }
+    } catch (error) {
+      console.log("Login Error:", error);
+      setError(error.message || "An error occurred while logging in.");
+    }
   };
 
   return (
@@ -36,12 +53,13 @@ function Login() {
               required
             />
           </div>
+          {error && <div className="error-message">{error}</div>}
           <button type="submit" className="login-button">
             Log In
           </button>
         </form>
         <p className="signup-text">
-          Don't have an account? <a href="/register">Sign up</a>
+          Don't have an account? <Link to="/register">Sign up</Link>
         </p>
       </div>
     </div>
