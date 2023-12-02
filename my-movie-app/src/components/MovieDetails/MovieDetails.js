@@ -3,6 +3,7 @@ import { useParams } from "react-router-dom";
 import "../../styles/main.css";
 import "./index.css";
 import { FaRegHeart, FaStar, FaPlus, FaPlay } from "react-icons/fa";
+import SubmitCommentForm from "../SubmitCommentForm";
 
 export const BASE_URL = "https://api.themoviedb.org/3";
 export const API_KEY = process.env.REACT_APP_TMBD_API_KEY;
@@ -13,6 +14,8 @@ function MovieDetails() {
   const { id } = useParams();
 
   console.log("ID is 77:", id);
+
+  const [reviews, setReviews] = useState([]);
 
   // play trailer
   const [trailerUrl, setTrailerUrl] = useState("");
@@ -110,10 +113,42 @@ function MovieDetails() {
       } catch (error) {
         console.error("Error fetching movie details:", error);
       }
+
+      try {
+        const reviewsResponse = await fetch(
+          `${process.env.REACT_APP_BASE_API_URL}/api/comments/${id}`
+        );
+
+        if (!reviewsResponse.ok) {
+          console.error("Error response status:", reviewsResponse.status);
+          console.error(
+            "Error response status text:",
+            reviewsResponse.statusText
+          );
+          throw new Error("Network response was not ok");
+        }
+        const reviewsData = await reviewsResponse.json();
+        setReviews(reviewsData);
+      } catch (error) {
+        console.error("Error fetching reviews:", error);
+      }
     };
 
     fetchMovieDetails();
   }, [id]);
+
+  const handleCommentSubmit = async () => {
+    // 重新获取评论
+    try {
+      const response = await fetch(
+        `${process.env.REACT_APP_BASE_API_URL}/api/comments/:movieId`
+      );
+      const data = await response.json();
+      setReviews(data);
+    } catch (error) {
+      console.error("Error fetching reviews:", error);
+    }
+  };
 
   function formatRuntime(minutes) {
     const hours = Math.floor(minutes / 60);
@@ -236,6 +271,29 @@ function MovieDetails() {
             </div>
           ))}
         </div>
+      </div>
+
+      <h2 className="mt-4">Reviews</h2>
+      <div className="reviews-container">
+        {reviews.map((review) => (
+          <div key={review.id} className="review">
+            <p>{review.comment}</p>
+            <p>Rating: {review.rating}</p>
+            <p>
+              By: <a href={`/user/${review.userId}`}>{review.username}</a>
+            </p>
+          </div>
+        ))}
+      </div>
+      <SubmitCommentForm movieId={id} onCommentSubmit={handleCommentSubmit} />
+      {/* 评论列表 */}
+      <h2 className="mt-4">Reviews</h2>
+      <div className="reviews-container">
+        {reviews.map((review) => (
+          <div key={review.id} className="review">
+            {/* ...展示评论的内容... */}
+          </div>
+        ))}
       </div>
     </div>
   );
