@@ -1,15 +1,29 @@
 import React, { useContext } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import "./index.css";
 import "../../styles/main.css";
 import { AuthContext } from "../../context/AuthContext";
+import { signout } from "../client";
 
 const Navbar = () => {
   const { auth, setAuth } = useContext(AuthContext);
+  const navigate = useNavigate();
 
-  const handleLogout = () => {
-    setAuth({ user: null, token: null });
-    // 这里可以添加逻辑来处理注销
+  // const handleLogout = () => {
+  //   setAuth({ user: null, token: null });
+  //   // 这里可以添加逻辑来处理注销
+  // };
+
+  const handleLogout = async () => {
+    try {
+      await signout();
+      setAuth({ user: null, token: null });
+      sessionStorage.removeItem("token"); // 清除 sessionStorage 中的令牌
+      sessionStorage.removeItem("user"); // 清除 sessionStorage 中的用户信息
+      navigate("/login"); // 将用户重定向到登录页面
+    } catch (error) {
+      console.error("Logout failed:", error);
+    }
   };
 
   return (

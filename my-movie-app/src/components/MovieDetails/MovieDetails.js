@@ -1,20 +1,29 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { useParams } from "react-router-dom";
 import "../../styles/main.css";
 import "./index.css";
 import { FaRegHeart, FaStar, FaPlus, FaPlay } from "react-icons/fa";
 import SubmitCommentForm from "../SubmitCommentForm";
+import { AuthContext } from "../../context/AuthContext";
+import * as client from "../client.js";
 
 export const BASE_URL = "https://api.themoviedb.org/3";
 export const API_KEY = process.env.REACT_APP_TMBD_API_KEY;
 
 function MovieDetails() {
+  // const { user } = useContext(AuthContext);
+  const { auth } = useContext(AuthContext);
+  const user = auth.user;
+  const [watchlist, setWatchlist] = useState([]);
+  const [isAlreadyInWatchlist, setIsAlreadyInWatchlist] = useState(false);
+
   const [movie, setMovie] = useState({});
   const [credits, setCredits] = useState({});
+
   const { id } = useParams();
 
   console.log("ID is 77:", id);
-
+  const [commentText, setCommentText] = useState("");
   const [reviews, setReviews] = useState([]);
 
   // play trailer
@@ -45,27 +54,90 @@ function MovieDetails() {
   }, [id]);
 
   // 处理添加到观看列表
-  const addToWatchList = () => {
+  const addToWatchList = async () => {
+    if (!user || !user._id || !auth.token) {
+      console.error("User is not logged in or user data is incomplete.");
+      return;
+    }
+
     console.log("Add to watch list", movie.id);
-    // 在这里添加将电影添加到观看列表的逻辑
+    const isMovieInWatchlist = watchlist.find((item) => item.id === movie.id);
+
+    if (!isMovieInWatchlist) {
+      try {
+        const response = await client.addToWatchlist(user._id, movie.id);
+        console.log("Movie added to watch list successfully", response);
+        setWatchlist([...watchlist, movie]);
+        setIsAlreadyInWatchlist(false);
+      } catch (error) {
+        console.error("Error adding movie to watch list:", error);
+      }
+    } else {
+      console.log("Movie is already in watchlist");
+      setIsAlreadyInWatchlist(true);
+    }
   };
 
   // 处理评分
-  const rateMovie = (rating) => {
+  const rateMovie = async (rating) => {
     console.log("Rate movie", movie.id, "with rating", rating);
-    // 在这里添加评分逻辑
+    try {
+      const response = await fetch(
+        `${process.env.REACT_APP_BASE_API_URL}/api/rateMovie`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${user.token}`,
+          },
+          body: JSON.stringify({
+            movieId: movie.id,
+            rating,
+          }),
+        }
+      );
+
+      if (response.ok) {
+        console.log("Movie rated successfully");
+      } else {
+        console.error("Failed to rate movie");
+      }
+    } catch (error) {
+      console.error("Error rating movie:", error);
+    }
   };
 
   // 处理标记为最爱
-  const markAsFavourite = () => {
-    console.log("Mark as favorite", movie.id);
-    // 在这里添加标记为最爱的逻辑
-  };
+  // const markAsFavourite = async () => {
+  //   console.log("Mark as favorite", movie.id);
+  //   try {
+  //     const response = await fetch(
+  //       `${process.env.REACT_APP_BASE_API_URL}/api/favorite`,
+  //       {
+  //         method: "POST",
+  //         headers: {
+  //           "Content-Type": "application/json",
+  //           Authorization: `Bearer ${user.token}`,
+  //         },
+  //         body: JSON.stringify({
+  //           movieId: movie.id,
+  //         }),
+  //       }
+  //     );
+
+  //     if (response.ok) {
+  //       console.log("Movie marked as favorite successfully");
+  //     } else {
+  //       console.error("Failed to mark movie as favorite");
+  //     }
+  //   } catch (error) {
+  //     console.error("Error marking movie as favorite:", error);
+  //   }
+  // };
 
   // 播放预告片
   const playTrailer = () => {
     console.log("Play trailer for movie", movie.id);
-    // 在这里添加播放预告片的逻辑
     if (trailerUrl) {
       window.open(trailerUrl, "_blank");
     } else {
@@ -129,6 +201,8 @@ function MovieDetails() {
         }
         const reviewsData = await reviewsResponse.json();
         setReviews(reviewsData);
+
+        console.log("Reviews data:", reviewsData);
       } catch (error) {
         console.error("Error fetching reviews:", error);
       }
@@ -138,15 +212,34 @@ function MovieDetails() {
   }, [id]);
 
   const handleCommentSubmit = async () => {
-    // 重新获取评论
     try {
+      console.log("Submitting comment...");
       const response = await fetch(
-        `${process.env.REACT_APP_BASE_API_URL}/api/comments/:movieId`
+        `${process.env.REACT_APP_BASE_API_URL}/api/comments/:movieId`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            movieId: id,
+            comment: commentText,
+            userId: user._id,
+          }),
+        }
       );
-      const data = await response.json();
-      setReviews(data);
+
+      if (response.ok) {
+        // 成功提交评论后，更新评论列表
+        const newComment = await response.json();
+        setReviews([...reviews, newComment]);
+        console.log("Comment submitted successfully:", newComment);
+      } else {
+        // 处理错误情况
+        console.error("Error submitting comment");
+      }
     } catch (error) {
-      console.error("Error fetching reviews:", error);
+      console.error("Error submitting comment:", error);
     }
   };
 
@@ -195,9 +288,9 @@ function MovieDetails() {
                 <button onClick={rateMovie} className="btn btn-rate">
                   <FaStar /> Rate It
                 </button>
-                <button onClick={markAsFavourite} className="btn btn-favourite">
+                {/* <button onClick={markAsFavourite} className="btn btn-favourite">
                   <FaRegHeart /> Mark as Favourite
-                </button>
+                </button> */}
                 <button onClick={playTrailer} className="btn btn-trailer">
                   <FaPlay /> Play Trailer
                 </button>
@@ -206,51 +299,14 @@ function MovieDetails() {
             <br />
             <h2>Overview</h2>
             <p>{movie.overview}</p>
-
-            {/* <h2>Cast</h2>
-            <ul>
-              {credits.cast?.slice(0, 10).map((actor) => (
-                <li key={actor.cast_id}>
-                  {actor.name} as {actor.character}
-                </li>
-              ))}
-            </ul> */}
           </div>
-        </div>
-      </div>
-
-      {/* <div className="row">
-        <div className="col-12">
-          <h2 className="text-center mt-4">Top Billed Cast</h2>
-        </div>
-      </div>
-      <div className="row">
-        {credits.cast?.slice(0, 10).map((actor) => (
-          <div
-            key={actor.cast_id}
-            className="col-lg-2 col-md-3 col-sm-4 col-6 mb-3"
-          >
-            <div className="card card-cast">
-              <img
-                src={`https://image.tmdb.org/t/p/w185${actor.profile_path}`}
-                alt={actor.name}
-                className="card-img-top"
-                onError={(e) => {
-                  e.target.onerror = null;
-                  e.target.src = "default_actor.png";
-                }}
-              />
-              <div className="card-body p-2">
-                <h6 className="card-title mb-1">{actor.name}</h6>
-                <p className="card-text">{actor.character}</p>
-              </div>
+          {isAlreadyInWatchlist && (
+            <div className="alert alert-warning" role="alert">
+              This movie is already in your watchlist.
             </div>
-          </div>
-        ))}
+          )}
+        </div>
       </div>
-    </div>
-  );
-} */}
 
       <h2 className="mt-4">Top Billed Cast</h2>
       <div className="cast-scrolling-container">
@@ -274,27 +330,22 @@ function MovieDetails() {
       </div>
 
       <h2 className="mt-4">Reviews</h2>
+
       <div className="reviews-container">
         {reviews.map((review) => (
-          <div key={review.id} className="review">
+          <div key={review._id} className="review">
+            <p>
+              By:{" "}
+              <a href={`/user/${review.userId}`}>{review.userId.username}</a>
+            </p>
             <p>{review.comment}</p>
             <p>Rating: {review.rating}</p>
-            <p>
-              By: <a href={`/user/${review.userId}`}>{review.username}</a>
-            </p>
           </div>
         ))}
       </div>
+      {console.log("reviews 999:", reviews)}
       <SubmitCommentForm movieId={id} onCommentSubmit={handleCommentSubmit} />
       {/* 评论列表 */}
-      <h2 className="mt-4">Reviews</h2>
-      <div className="reviews-container">
-        {reviews.map((review) => (
-          <div key={review.id} className="review">
-            {/* ...展示评论的内容... */}
-          </div>
-        ))}
-      </div>
     </div>
   );
 }

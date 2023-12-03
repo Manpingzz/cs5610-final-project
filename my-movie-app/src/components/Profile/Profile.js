@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState } from "react";
 import { AuthContext } from "../../context/AuthContext";
-import * as client from "../client";
+import * as client from "../client.js";
 import "./index.css";
 
 function Profile() {
@@ -10,6 +10,8 @@ function Profile() {
   const [userData, setUserData] = useState({});
   const [editMode, setEditMode] = useState(false);
   const [activeTab, setActiveTab] = useState("personal");
+  const [watchList, setWatchList] = useState([]);
+
   useEffect(() => {
     console.log("auth.user:", auth.user);
 
@@ -25,16 +27,34 @@ function Profile() {
     };
 
     fetchUserData();
+
+    //watchlist
+    const fetchFavoritesData = async () => {
+      if (auth.user && auth.user.favorites) {
+        try {
+          const favorites = auth.user.favorites;
+          console.log("favorites:", favorites);
+          const favoritesInfo = await Promise.all(
+            favorites.map(async (movieId) => {
+              const movieData = await client.getMovieDetails(movieId);
+              console.log("movieData:", movieData);
+              return movieData;
+            })
+          );
+          setWatchList(favoritesInfo);
+        } catch (error) {
+          console.error("Error fetching favorites data:", error);
+        }
+      }
+    };
+    fetchFavoritesData();
   }, [auth.user]);
 
   const handleUpdate = async (event) => {
     event.preventDefault();
     const userId = auth.user._id;
-    console.log("Updating user with ID:", userId); // 确保 ID 是正确的
-    console.log("Updated user data:", userData); // 查看更新的数据
 
     try {
-      // 发送更新请求到后端
       await client.updateUser(userId, userData);
       alert("Profile updated successfully.");
       setEditMode(false);
@@ -49,92 +69,6 @@ function Profile() {
   }
 
   return (
-    //     <div className="profile-container">
-    //       <h1>User Profile</h1>
-    //       <div className="profile-details">
-    //         <div className="profile-section">
-    //           <h2>Personal Information</h2>
-    //           {editMode ? (
-    //             <form onSubmit={handleUpdate}>
-    //               <div className="form-group mt-3 mb-3">
-    //                 Username:
-    //                 <input
-    //                   type="text"
-    //                   value={userData.username}
-    //                   onChange={(e) =>
-    //                     setUserData({ ...userData, username: e.target.value })
-    //                   }
-    //                 />
-    //               </div>
-    //               <div className="form-group mt-3 mb-3">
-    //                 Email:
-    //                 <input
-    //                   type="email"
-    //                   value={userData.email}
-    //                   onChange={(e) =>
-    //                     setUserData({ ...userData, email: e.target.value })
-    //                   }
-    //                 />
-    //               </div>
-    //               <div className="form-group mt-3 mb-3">
-    //                 Password:
-    //                 <input
-    //                   type="password"
-    //                   onChange={(e) =>
-    //                     setUserData({ ...userData, password: e.target.value })
-    //                   }
-    //                 />
-    //               </div>
-    //               <div className="form-group mt-3 mb-3">
-    //                 FirstName:
-    //                 <input
-    //                   type="text"
-    //                   value={userData.firstName}
-    //                   onChange={(e) =>
-    //                     setUserData({ ...userData, firstName: e.target.value })
-    //                   }
-    //                 />
-    //               </div>
-    //               <div className="form-group mt-3 mb-3">
-    //                 LastName:
-    //                 <input
-    //                   type="text"
-    //                   value={userData.lastName}
-    //                   onChange={(e) =>
-    //                     setUserData({ ...userData, lastName: e.target.value })
-    //                   }
-    //                 />
-    //               </div>
-    //               <button type="submit">Save Changes</button>
-    //               <button type="button" onClick={() => setEditMode(false)}>
-    //                 Cancel
-    //               </button>
-    //             </form>
-    //           ) : (
-    //             <>
-    //               <p>
-    //                 <strong>Username:</strong> {userData.username}
-    //               </p>
-    //               <p>
-    //                 <strong>Password:</strong> {userData.password}
-    //               </p>
-    //               <p>
-    //                 <strong>Email:</strong> {userData.email}
-    //               </p>
-    //               <p>
-    //                 <strong>FirstName:</strong> {userData.firstName}
-    //               </p>
-    //               <p>
-    //                 <strong>LastName:</strong> {userData.lastName}
-    //               </p>
-    //               <button onClick={() => setEditMode(true)}>Edit Profile</button>
-    //             </>
-    //           )}
-    //         </div>
-    //       </div>
-    //     </div>
-    //   );
-    // }
     <div className="profile-container">
       <h1>User Profile</h1>
       <div className="profile-tabs">
@@ -149,6 +83,12 @@ function Profile() {
           onClick={() => setActiveTab("security")}
         >
           Security
+        </button>
+        <button
+          className={activeTab === "watchlist" ? "active" : ""}
+          onClick={() => setActiveTab("watchlist")}
+        >
+          Watchlist
         </button>
       </div>
       <div className="profile-details">
@@ -200,7 +140,7 @@ function Profile() {
               Save Changes
             </button>
           </form>
-        ) : (
+        ) : activeTab === "security" ? (
           <div className="security-section">
             <h2>Security</h2>
             <p>
@@ -212,6 +152,22 @@ function Profile() {
             <button className="btn" onClick={() => alert("Change Password")}>
               Change Password
             </button>
+          </div>
+        ) : (
+          <div className="watchlist-section">
+            <h2>Watchlist</h2>
+            <ul>
+              {watchList.map((movie) => (
+                <li key={movie.id}>
+                  <h3>{movie.title}</h3>
+                  <img
+                    src={`https://image.tmdb.org/t/p/w500/${movie.poster_path}`}
+                    alt={movie.title}
+                  />
+                  <p>{movie.description}</p>
+                </li>
+              ))}
+            </ul>
           </div>
         )}
       </div>

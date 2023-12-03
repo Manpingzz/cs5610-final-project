@@ -7,13 +7,16 @@ function SubmitCommentForm({ movieId, onCommentSubmit }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     // 提交评论的逻辑
-    const response = await fetch("/api/comments", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ movieId, comment: commentText }),
-    });
+    const response = await fetch(
+      `${process.env.REACT_APP_BASE_API_URL}/api/comments`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ movieId, comment: commentText }),
+      }
+    );
 
     if (response.ok) {
       setCommentText("");
