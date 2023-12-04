@@ -16,6 +16,7 @@ function MovieDetails() {
   const user = auth.user;
   const [watchlist, setWatchlist] = useState([]);
   const [isAlreadyInWatchlist, setIsAlreadyInWatchlist] = useState(false);
+  const [showAddSuccess, setShowAddSuccess] = useState(false);
 
   const [movie, setMovie] = useState({});
   const [credits, setCredits] = useState({});
@@ -61,7 +62,7 @@ function MovieDetails() {
     }
 
     console.log("Add to watch list", movie.id);
-    const isMovieInWatchlist = watchlist.find((item) => item.id === movie.id);
+    const isMovieInWatchlist = watchlist.some((item) => item.id === movie.id);
 
     if (!isMovieInWatchlist) {
       try {
@@ -69,6 +70,8 @@ function MovieDetails() {
         console.log("Movie added to watch list successfully", response);
         setWatchlist([...watchlist, movie]);
         setIsAlreadyInWatchlist(false);
+        setShowAddSuccess(true);
+        setTimeout(() => setShowAddSuccess(false), 3000);
       } catch (error) {
         console.error("Error adding movie to watch list:", error);
       }
@@ -300,6 +303,11 @@ function MovieDetails() {
             <h2>Overview</h2>
             <p>{movie.overview}</p>
           </div>
+          {showAddSuccess && (
+            <div className="alert alert-success" role="alert">
+              Movie added to watchlist successfully!
+            </div>
+          )}
           {isAlreadyInWatchlist && (
             <div className="alert alert-warning" role="alert">
               This movie is already in your watchlist.

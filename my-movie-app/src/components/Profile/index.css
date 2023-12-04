@@ -1,12 +1,15 @@
 .profile-container {
-  padding: 20px;
-  max-width: 800px;
-  margin: auto;
+  padding: 10px;
+  max-width: 1200px;
+  margin: 10px auto; /* 增加顶部和底部的边距 */
+  background-color: #fff; /* 设置背景颜色为白色 */
+  border-radius: 8px; /* 给容器添加圆角 */
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
 .profile-section {
   background-color: #f5f5f5;
-  padding: 20px;
+  padding: 10px;
   margin-bottom: 20px;
   border-radius: 8px;
 }
@@ -19,29 +22,95 @@
 .profile-details p {
   margin: 5px 0;
 }
-/* 标签导航容器 */
+
 .profile-tabs {
-  display: flex;
+  margin-bottom: 10px;
 }
 
-/* 单个标签样式 */
-.profile-tab {
-  flex: 1;
-  text-align: center;
-
-  cursor: pointer;
-  color: white;
+.profile-tabs button {
   background-color: rgb(200, 157, 243);
-  border-end-end-radius: 4px;
-  outline: none;
-  transition: background-color 0.3s;
+  border: none;
+  padding: 5px 10px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border-radius: 8px;
+  color: white;
 }
 
-/* 激活状态的标签样式 */
-.profile-tab.active {
-  background-color: rgb(200, 157, 239);
-  color: yellow;
+.profile-tabs button:not(:last-child) {
+  margin-right: 3px;
 }
+
+.profile-tabs button.active {
+  color: rgb(199, 16, 250);
+  border-bottom: 2px solid gray;
+}
+
+.profile-details {
+  background-color: #fff;
+  border-radius: 10px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+.watchlist-section {
+  padding: 20px;
+  color: white;
+  background-color: white;
+}
+
+.watchlist-grid {
+  display: flex;
+  /* grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); */
+  flex-wrap: wrap;
+  justify-content: space-between;
+  /* gap: 20px; */
+}
+
+.watch-movie-card {
+  width: 220px;
+
+  background-color: #202020;
+  border-radius: 10px;
+  overflow: hidden;
+  flex: 0 1 calc(33.33% - 20px);
+}
+
+.watch-movie-image {
+  width: 100%; /* 图片宽度充满卡片 */
+  height: 220px; /* 图片高度自动调整 */
+
+  object-fit: cover;
+}
+
+.movie-info {
+  padding: 10px;
+}
+
+.movie-info h3 {
+  margin-top: 10px;
+  align-items: center;
+  color: #f5f5f5;
+  text-align: center;
+  font-size: 1em;
+}
+
+.movie-info p {
+  font-size: 0.9em;
+  color: white;
+  text-align: center;
+}
+
 .btn {
   background-color: rgb(200, 157, 243);
+}
+
+@media (max-width: 600px) {
+  .movie-card {
+    flex-direction: column; /* 在小屏幕上堆叠布局 */
+  }
+
+  .movie-card img {
+    width: 100%; /* 小屏幕上图片宽度 */
+  }
 }

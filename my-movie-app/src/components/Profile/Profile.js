@@ -1,4 +1,5 @@
 import React, { useContext, useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import { AuthContext } from "../../context/AuthContext";
 import * as client from "../client.js";
 import "./index.css";
@@ -10,6 +11,9 @@ function Profile() {
   const [userData, setUserData] = useState({});
   const [editMode, setEditMode] = useState(false);
   const [activeTab, setActiveTab] = useState("personal");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmNewPassword, setConfirmNewPassword] = useState("");
+
   const [watchList, setWatchList] = useState([]);
 
   useEffect(() => {
@@ -68,6 +72,26 @@ function Profile() {
     return <div>Please login to view this page.</div>;
   }
 
+  const handlePasswordUpdate = async () => {
+    if (newPassword !== confirmNewPassword) {
+      alert("Passwords do not match!");
+      return;
+    }
+
+    try {
+      await client.updateUser(auth.user._id, {
+        ...userData,
+        password: newPassword,
+      });
+      alert("Password updated successfully.");
+      setNewPassword("");
+      setConfirmNewPassword("");
+    } catch (error) {
+      console.error("Error updating password:", error);
+      alert("Failed to update password.");
+    }
+  };
+
   return (
     <div className="profile-container">
       <h1>User Profile</h1>
@@ -98,13 +122,6 @@ function Profile() {
               <p>
                 <strong>Username:</strong> {userData.username}
               </p>
-              {/* <input
-                type="text"
-                value={userData.username}
-                onChange={(e) =>
-                  setUserData({ ...userData, username: e.target.value })
-                }
-              /> */}
             </div>
             <div className="form-group mt-3 mb-3">
               <label>Email:</label>
@@ -142,32 +159,55 @@ function Profile() {
           </form>
         ) : activeTab === "security" ? (
           <div className="security-section">
-            <h2>Security</h2>
             <p>
               <strong>Username:</strong> {userData.username}
             </p>
-            <p>
-              <strong>Password:</strong> ********
-            </p>
-            <button className="btn" onClick={() => alert("Change Password")}>
-              Change Password
+
+            <div className="form-group mt-3 mb-3">
+              <label>New Password:</label>
+              <input
+                type="password"
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+              />
+            </div>
+            <div className="form-group mt-3 mb-3">
+              <label>Confirm New Password:</label>
+              <input
+                type="password"
+                value={confirmNewPassword}
+                onChange={(e) => setConfirmNewPassword(e.target.value)}
+              />
+            </div>
+            <button className="btn" onClick={handlePasswordUpdate}>
+              Update Password
             </button>
           </div>
         ) : (
           <div className="watchlist-section">
-            <h2>Watchlist</h2>
-            <ul>
-              {watchList.map((movie) => (
-                <li key={movie.id}>
-                  <h3>{movie.title}</h3>
+            {watchList.map((movie) => (
+              <Link
+                to={`/movie/${movie.id}`}
+                key={movie.id}
+                className="watch-movie-card-link"
+              >
+                <div className="watch-movie-card">
                   <img
                     src={`https://image.tmdb.org/t/p/w500/${movie.poster_path}`}
                     alt={movie.title}
+                    className="watch-movie-image"
                   />
-                  <p>{movie.description}</p>
-                </li>
-              ))}
-            </ul>
+                  <div className="movie-info">
+                    <h3>{movie.title}</h3>
+                    <p>{movie.release_date}</p>
+                    <p>
+                      <span className="star-icon">⭐</span> {movie.vote_average}
+                    </p>
+                    {/* <p>{movie.overview}</p> */}
+                  </div>
+                </div>
+              </Link>
+            ))}
           </div>
         )}
       </div>
