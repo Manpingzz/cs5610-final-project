@@ -60,8 +60,8 @@
 }
 
 .watchlist-grid {
-  display: flex;
-  /* grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); */
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
   flex-wrap: wrap;
   justify-content: space-between;
   /* gap: 20px; */
@@ -69,17 +69,18 @@
 
 .watch-movie-card {
   width: 220px;
-
+  display: inline-block;
   background-color: #202020;
   border-radius: 10px;
   overflow: hidden;
   flex: 0 1 calc(33.33% - 20px);
+  margin: 5px;
 }
 
 .watch-movie-image {
   width: 100%; /* 图片宽度充满卡片 */
   height: 220px; /* 图片高度自动调整 */
-
+  display: block;
   object-fit: cover;
 }
 
@@ -107,10 +108,10 @@
 
 @media (max-width: 600px) {
   .movie-card {
-    flex-direction: column; /* 在小屏幕上堆叠布局 */
+    flex-direction: column;
   }
 
   .movie-card img {
-    width: 100%; /* 小屏幕上图片宽度 */
+    width: 100%;
   }
 }

@@ -147,3 +147,14 @@ export const getMovieDetails = async (movieId) => {
     throw error;
   }
 };
+
+export const getUserRatings = async (userId) => {
+  try {
+    const response = await request.get(`${BASE_API}/api/userRatings/${userId}`);
+    console.log("Received user ratings:", response.data);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching user ratings:", error);
+    throw error;
+  }
+};

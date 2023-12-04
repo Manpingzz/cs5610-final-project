@@ -29,7 +29,7 @@ const Navbar = () => {
   return (
     <nav className="navbar navbar-expand-lg navbar-custom">
       <Link to="/" className="navbar-brand">
-        My Movie
+        MovieFeeds
       </Link>
 
       <button

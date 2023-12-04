@@ -1,7 +1,7 @@
 .movie-card {
   min-width: 200px;
-  margin-right: 10px;
-  width: auto;
+  margin-right: 4px;
+  height: auto;
   background-color: white;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
   border-radius: 8px;
@@ -9,8 +9,8 @@
   text-align: center;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
   display: inline-block;
-  width: calc(25% - 20px); /* 四列布局，并减去间隙 */
-  margin: 10px;
+  /* width: calc(25% - 20px);  */
+  margin: 5px;
 }
 
 .movie-card:hover {

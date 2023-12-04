@@ -55,18 +55,6 @@ export const searchMovies = async (query) => {
   }
 };
 
-// search actors or directors
-// export const searchPeople = async (query) => {
-//   const response = await fetch(
-//     `${BASE_URL}/search/person?api_key=${API_KEY}&language=en-US&query=${query}`
-//   );
-//   console.log("888response:", response);
-//   if (!response.ok) {
-//     throw new Error("Network response was not ok");
-//   }
-//   return response.json();
-// };
-
 export const searchPeople = async (searchTerm) => {
   try {
     const response = await fetch(

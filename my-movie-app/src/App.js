@@ -24,6 +24,7 @@ import PersonDetails from "./components/PersonDetails";
 import TVShowDetails from "./components/TVShowDetails/TVShowDetails";
 import { AuthProvider } from "./context/AuthContext";
 import { WatchlistProvider } from "./components/WatchlistContext";
+import "bootstrap/dist/css/bootstrap.min.css";
 
 function App() {
   const [searchResults, setSearchResults] = useState([]);

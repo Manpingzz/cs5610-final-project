@@ -13,7 +13,7 @@ function Profile() {
   const [activeTab, setActiveTab] = useState("personal");
   const [newPassword, setNewPassword] = useState("");
   const [confirmNewPassword, setConfirmNewPassword] = useState("");
-
+  const [userRatings, setUserRatings] = useState([]);
   const [watchList, setWatchList] = useState([]);
 
   useEffect(() => {
@@ -31,6 +31,52 @@ function Profile() {
     };
 
     fetchUserData();
+
+    // user rating
+    // const fetchUserRatings = async () => {
+    //   if (auth.user && auth.user._id) {
+    //     try {
+    //       const ratings = await client.getUserRatings(auth.user._id);
+    //       console.log("ratings:", ratings);
+    //       setUserRatings(ratings);
+    //     } catch (error) {
+    //       console.error("Error fetching user ratings:", error);
+    //     }
+    //   }
+    // };
+    const fetchUserRatings = async () => {
+      if (auth.user && auth.user._id) {
+        try {
+          // 获取用户的评分数据
+          const ratings = await client.getUserRatings(auth.user._id);
+
+          // 对每个评分获取对应的电影详细信息
+          const ratingsWithDetails = await Promise.all(
+            ratings.map(async (rating) => {
+              try {
+                const movieDetails = await client.getMovieDetails(
+                  rating.movieId
+                );
+                return { ...rating, movieDetails };
+              } catch (error) {
+                console.error(
+                  `Error fetching details for movie ${rating.movieId}:`,
+                  error
+                );
+                return { ...rating, movieDetails: null };
+              }
+            })
+          );
+
+          // 更新状态以反映获取的数据
+          setUserRatings(ratingsWithDetails);
+        } catch (error) {
+          console.error("Error fetching user ratings:", error);
+        }
+      }
+    };
+
+    fetchUserRatings();
 
     //watchlist
     const fetchFavoritesData = async () => {
@@ -53,6 +99,23 @@ function Profile() {
     };
     fetchFavoritesData();
   }, [auth.user]);
+
+  const fetchUserRatings = async () => {
+    if (auth.user && auth.user._id) {
+      try {
+        const ratings = await client.getUserRatings(auth.user._id);
+        const ratingsWithDetails = await Promise.all(
+          ratings.map(async (rating) => {
+            const movieDetails = await client.getMovieDetails(rating.movieId);
+            return { ...rating, movieDetails };
+          })
+        );
+        setUserRatings(ratingsWithDetails);
+      } catch (error) {
+        console.error("Error fetching user ratings:", error);
+      }
+    }
+  };
 
   const handleUpdate = async (event) => {
     event.preventDefault();
@@ -114,9 +177,15 @@ function Profile() {
         >
           Watchlist
         </button>
+        <button
+          className={activeTab === "ratings" ? "active" : ""}
+          onClick={() => setActiveTab("ratings")}
+        >
+          Ratings
+        </button>
       </div>
       <div className="profile-details">
-        {activeTab === "personal" ? (
+        {activeTab === "personal" && (
           <form onSubmit={handleUpdate}>
             <div className="form-group">
               <p>
@@ -157,7 +226,8 @@ function Profile() {
               Save Changes
             </button>
           </form>
-        ) : activeTab === "security" ? (
+        )}
+        {activeTab === "security" && (
           <div className="security-section">
             <p>
               <strong>Username:</strong> {userData.username}
@@ -183,7 +253,8 @@ function Profile() {
               Update Password
             </button>
           </div>
-        ) : (
+        )}
+        {activeTab === "watchlist" && (
           <div className="watchlist-section">
             {watchList.map((movie) => (
               <Link
@@ -208,6 +279,35 @@ function Profile() {
                 </div>
               </Link>
             ))}
+          </div>
+        )}
+
+        {activeTab === "ratings" && (
+          <div className="ratings-section">
+            <h5>My Ratings</h5>
+            {userRatings.length > 0 ? (
+              <div>
+                {userRatings.map((rating, index) => (
+                  <div key={index} className="watch-movie-card">
+                    <Link to={`/movie/${rating.movieId}`}>
+                      <img
+                        src={`https://image.tmdb.org/t/p/w500/${rating.movieDetails.poster_path}`}
+                        alt={rating.movieDetails.title}
+                        className="watch-movie-image"
+                      />
+                      <div className="movie-info">
+                        <Link to={`/movie/${rating.movieId}`}>
+                          <h3>{rating.movieDetails.title}</h3>
+                        </Link>
+                        <p>Rating: {rating.rating}</p>
+                      </div>
+                    </Link>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p>No ratings available.</p>
+            )}
           </div>
         )}
       </div>

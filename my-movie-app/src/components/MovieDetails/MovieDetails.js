@@ -2,13 +2,43 @@ import React, { useState, useEffect, useContext } from "react";
 import { useParams } from "react-router-dom";
 import "../../styles/main.css";
 import "./index.css";
-import { FaRegHeart, FaStar, FaPlus, FaPlay } from "react-icons/fa";
+import { FaPen, FaStar, FaPlus, FaPlay } from "react-icons/fa";
 import SubmitCommentForm from "../SubmitCommentForm";
 import { AuthContext } from "../../context/AuthContext";
 import * as client from "../client.js";
+import { Modal, Button } from "react-bootstrap";
+import { faStar } from "react-icons/fa";
 
 export const BASE_URL = "https://api.themoviedb.org/3";
 export const API_KEY = process.env.REACT_APP_TMBD_API_KEY;
+
+// rating
+const StarRating = ({ onRatingSelected }) => {
+  const [rating, setRating] = useState(0);
+  const [hover, setHover] = useState(0);
+  return (
+    <div className="star-rating">
+      {[...Array(5)].map((star, index) => {
+        index += 1;
+        return (
+          <button
+            type="button"
+            key={index}
+            className={index <= (hover || rating) ? "star on" : "star off"}
+            onClick={() => {
+              setRating(index);
+              onRatingSelected(index);
+            }}
+            onMouseEnter={() => setHover(index)}
+            onMouseLeave={() => setHover(rating)}
+          >
+            <FaStar />
+          </button>
+        );
+      })}
+    </div>
+  );
+};
 
 function MovieDetails() {
   // const { user } = useContext(AuthContext);
@@ -17,15 +47,54 @@ function MovieDetails() {
   const [watchlist, setWatchlist] = useState([]);
   const [isAlreadyInWatchlist, setIsAlreadyInWatchlist] = useState(false);
   const [showAddSuccess, setShowAddSuccess] = useState(false);
-
+  const [showReviewForm, setShowReviewForm] = useState(false);
   const [movie, setMovie] = useState({});
   const [credits, setCredits] = useState({});
 
   const { id } = useParams();
-
-  console.log("ID is 77:", id);
   const [commentText, setCommentText] = useState("");
   const [reviews, setReviews] = useState([]);
+  const [showRatingModal, setShowRatingModal] = useState(false);
+
+  const handleRatingSubmit = async (rating) => {
+    console.log("Submitting rating...", rating);
+    // 检查用户信息和认证令牌
+    if (!user || !user._id || !auth.token) {
+      console.error("User is not authenticated.");
+      return;
+    }
+
+    try {
+      // 发送POST请求到后端
+      const response = await fetch(
+        `${process.env.REACT_APP_BASE_API_URL}/api/comments`,
+
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${auth.token}`,
+          },
+          body: JSON.stringify({
+            movieId: id,
+            userId: user._id,
+            rating,
+          }),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Network response was not ok.");
+      }
+
+      // 处理响应数据
+      const data = await response.json();
+      console.log("Rating submitted successfully:", data);
+      setShowRatingModal(false); // 关闭模态框
+    } catch (error) {
+      console.error("Error submitting rating:", error);
+    }
+  };
 
   // play trailer
   const [trailerUrl, setTrailerUrl] = useState("");
@@ -82,33 +151,33 @@ function MovieDetails() {
   };
 
   // 处理评分
-  const rateMovie = async (rating) => {
-    console.log("Rate movie", movie.id, "with rating", rating);
-    try {
-      const response = await fetch(
-        `${process.env.REACT_APP_BASE_API_URL}/api/rateMovie`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${user.token}`,
-          },
-          body: JSON.stringify({
-            movieId: movie.id,
-            rating,
-          }),
-        }
-      );
+  // const rateMovie = async (rating) => {
+  //   console.log("Rate movie", movie.id, "with rating", rating);
+  //   try {
+  //     const response = await fetch(
+  //       `${process.env.REACT_APP_BASE_API_URL}/api/rateMovie`,
+  //       {
+  //         method: "POST",
+  //         headers: {
+  //           "Content-Type": "application/json",
+  //           Authorization: `Bearer ${user.token}`,
+  //         },
+  //         body: JSON.stringify({
+  //           movieId: movie.id,
+  //           rating,
+  //         }),
+  //       }
+  //     );
 
-      if (response.ok) {
-        console.log("Movie rated successfully");
-      } else {
-        console.error("Failed to rate movie");
-      }
-    } catch (error) {
-      console.error("Error rating movie:", error);
-    }
-  };
+  //     if (response.ok) {
+  //       console.log("Movie rated successfully");
+  //     } else {
+  //       console.error("Failed to rate movie");
+  //     }
+  //   } catch (error) {
+  //     console.error("Error rating movie:", error);
+  //   }
+  // };
 
   // 处理标记为最爱
   // const markAsFavourite = async () => {
@@ -288,8 +357,17 @@ function MovieDetails() {
                 <button onClick={addToWatchList} className="btn btn-watchlist">
                   <FaPlus /> Add to Watchlist
                 </button>
-                <button onClick={rateMovie} className="btn btn-rate">
+                <button
+                  onClick={() => setShowRatingModal(true)}
+                  className="btn btn-primary"
+                >
                   <FaStar /> Rate It
+                </button>{" "}
+                <button
+                  onClick={() => setShowReviewForm(true)}
+                  className="btn btn-review"
+                >
+                  <FaPen /> Write a Review
                 </button>
                 {/* <button onClick={markAsFavourite} className="btn btn-favourite">
                   <FaRegHeart /> Mark as Favourite
@@ -298,6 +376,27 @@ function MovieDetails() {
                   <FaPlay /> Play Trailer
                 </button>
               </div>
+              <Modal
+                show={showRatingModal}
+                onHide={() => setShowRatingModal(false)}
+              >
+                <Modal.Header closeButton>
+                  <Modal.Title>Rate the Movie</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                  <StarRating
+                    onRatingSelected={(rating) => handleRatingSubmit(rating)}
+                  />
+                </Modal.Body>
+                <Modal.Footer>
+                  <Button
+                    variant="secondary"
+                    onClick={() => setShowRatingModal(false)}
+                  >
+                    Close
+                  </Button>
+                </Modal.Footer>
+              </Modal>
             </div>
             <br />
             <h2>Overview</h2>

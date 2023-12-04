@@ -51,11 +51,12 @@ function MovieCard({ id, title, description, poster, date, rating }) {
           <p className="card-text">
             <small className="text-muted">{date}</small>
           </p>
-          {/* {rating && (
+          {rating && (
             <p className="card-text">
+              <span className="star-icon">⭐</span>
               <small className="text-muted">Rating: {rating}</small>
             </p>
-          )} */}
+          )}
         </div>
       </Link>
     </div>
