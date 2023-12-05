@@ -47,10 +47,8 @@ function Profile() {
     const fetchUserRatings = async () => {
       if (auth.user && auth.user._id) {
         try {
-          // 获取用户的评分数据
           const ratings = await client.getUserRatings(auth.user._id);
 
-          // 对每个评分获取对应的电影详细信息
           const ratingsWithDetails = await Promise.all(
             ratings.map(async (rating) => {
               try {
@@ -68,7 +66,6 @@ function Profile() {
             })
           );
 
-          // 更新状态以反映获取的数据
           setUserRatings(ratingsWithDetails);
         } catch (error) {
           console.error("Error fetching user ratings:", error);

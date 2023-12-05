@@ -56,16 +56,21 @@ function MovieDetails() {
   const [reviews, setReviews] = useState([]);
   const [showRatingModal, setShowRatingModal] = useState(false);
 
+  const scrollToReviewForm = () => {
+    const reviewFormSection = document.querySelector("#reviewsSection");
+    if (reviewFormSection) {
+      reviewFormSection.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  };
+
   const handleRatingSubmit = async (rating) => {
     console.log("Submitting rating...", rating);
-    // 检查用户信息和认证令牌
     if (!user || !user._id || !auth.token) {
       console.error("User is not authenticated.");
       return;
     }
 
     try {
-      // 发送POST请求到后端
       const response = await fetch(
         `${process.env.REACT_APP_BASE_API_URL}/api/comments`,
 
@@ -87,10 +92,9 @@ function MovieDetails() {
         throw new Error("Network response was not ok.");
       }
 
-      // 处理响应数据
       const data = await response.json();
       console.log("Rating submitted successfully:", data);
-      setShowRatingModal(false); // 关闭模态框
+      setShowRatingModal(false);
     } catch (error) {
       console.error("Error submitting rating:", error);
     }
@@ -123,7 +127,7 @@ function MovieDetails() {
     fetchTrailerUrl();
   }, [id]);
 
-  // 处理添加到观看列表
+  // add to watchlist
   const addToWatchList = async () => {
     if (!user || !user._id || !auth.token) {
       console.error("User is not logged in or user data is incomplete.");
@@ -150,64 +154,7 @@ function MovieDetails() {
     }
   };
 
-  // 处理评分
-  // const rateMovie = async (rating) => {
-  //   console.log("Rate movie", movie.id, "with rating", rating);
-  //   try {
-  //     const response = await fetch(
-  //       `${process.env.REACT_APP_BASE_API_URL}/api/rateMovie`,
-  //       {
-  //         method: "POST",
-  //         headers: {
-  //           "Content-Type": "application/json",
-  //           Authorization: `Bearer ${user.token}`,
-  //         },
-  //         body: JSON.stringify({
-  //           movieId: movie.id,
-  //           rating,
-  //         }),
-  //       }
-  //     );
-
-  //     if (response.ok) {
-  //       console.log("Movie rated successfully");
-  //     } else {
-  //       console.error("Failed to rate movie");
-  //     }
-  //   } catch (error) {
-  //     console.error("Error rating movie:", error);
-  //   }
-  // };
-
-  // 处理标记为最爱
-  // const markAsFavourite = async () => {
-  //   console.log("Mark as favorite", movie.id);
-  //   try {
-  //     const response = await fetch(
-  //       `${process.env.REACT_APP_BASE_API_URL}/api/favorite`,
-  //       {
-  //         method: "POST",
-  //         headers: {
-  //           "Content-Type": "application/json",
-  //           Authorization: `Bearer ${user.token}`,
-  //         },
-  //         body: JSON.stringify({
-  //           movieId: movie.id,
-  //         }),
-  //       }
-  //     );
-
-  //     if (response.ok) {
-  //       console.log("Movie marked as favorite successfully");
-  //     } else {
-  //       console.error("Failed to mark movie as favorite");
-  //     }
-  //   } catch (error) {
-  //     console.error("Error marking movie as favorite:", error);
-  //   }
-  // };
-
-  // 播放预告片
+  // play trailer
   const playTrailer = () => {
     console.log("Play trailer for movie", movie.id);
     if (trailerUrl) {
@@ -235,12 +182,8 @@ function MovieDetails() {
       }
       try {
         const [movieRes, creditsRes] = await Promise.all([
+          fetch(`${BASE_URL}/movie/${id}?api_key=${API_KEY}&language=en-US`),
           fetch(
-            // `https://api.themoviedb.org/3/movie/${id}?api_key=YOUR_API_KEY&language=en-US`
-            `${BASE_URL}/movie/${id}?api_key=${API_KEY}&language=en-US`
-          ),
-          fetch(
-            // `https://api.themoviedb.org/3/movie/${id}/credits?api_key=YOUR_API_KEY&language=en-US`
             `${BASE_URL}/movie/${id}/credits?api_key=${API_KEY}&language=en-US`
           ),
         ]);
@@ -283,31 +226,98 @@ function MovieDetails() {
     fetchMovieDetails();
   }, [id]);
 
-  const handleCommentSubmit = async () => {
+  // const handleReviewSubmit = async (reviewData) => {
+  //   try {
+  //     const response = await client.createComment(reviewData);
+  //     console.log("Review submitted:", response);
+  //   } catch (error) {
+  //     console.error("Error submitting review:", error);
+  //   }
+  // };
+
+  // const handleCommentSubmit = async () => {
+  //   console.log("Submitting comment...");
+
+  //   if (!user || !user._id) {
+  //     console.error("User information is missing.");
+  //     return;
+  //   }
+
+  //   const requestData = {
+  //     movieId: id,
+  //     userId: user._id,
+  //     comment: commentText,
+  //   };
+
+  //   console.log("Submitting comment with data:", requestData);
+
+  //   try {
+  //     const response = await fetch(
+  //       `${process.env.REACT_APP_BASE_API_URL}/api/comments`,
+  //       {
+  //         method: "POST",
+  //         headers: {
+  //           "Content-Type": "application/json",
+  //           Authorization: `Bearer ${auth.token}`,
+  //         },
+  //         body: JSON.stringify(requestData),
+  //       }
+  //     );
+
+  //     if (response.ok) {
+  //       const newComment = await response.json();
+  //       setReviews([...reviews, newComment]);
+  //       console.log("Comment submitted successfully:", newComment);
+  //     } else {
+  //       console.error(
+  //         "Error submitting comment, response status:",
+  //         response.status
+  //       );
+  //     }
+  //   } catch (error) {
+  //     console.error("Error submitting comment:", error);
+  //   }
+  // };
+
+  const handleCommentSubmit = async (movieId, commentText, userId, token) => {
+    console.log("handleCommentSubmit called with:", {
+      movieId,
+      commentText,
+      userId,
+      token,
+    });
+    console.log("Current user1204:", user);
+    console.log("User ID1204:", user?._id);
+
+    const requestData = {
+      movieId: id,
+      comment: commentText,
+      userId: user?._id,
+    };
+
+    console.log("Submitting comment with data:", requestData);
+
     try {
       console.log("Submitting comment...");
       const response = await fetch(
-        `${process.env.REACT_APP_BASE_API_URL}/api/comments/:movieId`,
+        `${process.env.REACT_APP_BASE_API_URL}/api/comments`,
         {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
+            Authorization: `Bearer ${auth.token}`,
           },
-          body: JSON.stringify({
-            movieId: id,
-            comment: commentText,
-            userId: user._id,
-          }),
+          body: JSON.stringify(requestData),
         }
       );
+      console.log("Response status:", response.status);
 
       if (response.ok) {
-        // 成功提交评论后，更新评论列表
         const newComment = await response.json();
         setReviews([...reviews, newComment]);
+
         console.log("Comment submitted successfully:", newComment);
       } else {
-        // 处理错误情况
         console.error("Error submitting comment");
       }
     } catch (error) {
@@ -326,7 +336,7 @@ function MovieDetails() {
   // poster URL
   const posterUrl = movie.poster_path
     ? `https://image.tmdb.org/t/p/w342${movie.poster_path}`
-    : "default_poster.jpg"; // If there is no poster，using default image.
+    : "default_poster.jpg";
 
   return (
     <div className="container mt-4">
@@ -359,19 +369,13 @@ function MovieDetails() {
                 </button>
                 <button
                   onClick={() => setShowRatingModal(true)}
-                  className="btn btn-primary"
+                  className="btn btn-rate"
                 >
                   <FaStar /> Rate It
                 </button>{" "}
-                <button
-                  onClick={() => setShowReviewForm(true)}
-                  className="btn btn-review"
-                >
+                <button onClick={scrollToReviewForm} className="btn btn-review">
                   <FaPen /> Write a Review
                 </button>
-                {/* <button onClick={markAsFavourite} className="btn btn-favourite">
-                  <FaRegHeart /> Mark as Favourite
-                </button> */}
                 <button onClick={playTrailer} className="btn btn-trailer">
                   <FaPlay /> Play Trailer
                 </button>
@@ -438,21 +442,32 @@ function MovieDetails() {
 
       <h2 className="mt-4">Reviews</h2>
 
-      <div className="reviews-container">
+      <div className="reviews-container mt-4">
         {reviews.map((review) => (
-          <div key={review._id} className="review">
-            <p>
-              By:{" "}
-              <a href={`/user/${review.userId}`}>{review.userId.username}</a>
-            </p>
-            <p>{review.comment}</p>
-            <p>Rating: {review.rating}</p>
+          <div key={review._id} className="card mb-3">
+            <div className="card-body">
+              <h5 className="card-title">
+                <a href={`/user/${review.userId}`} className="text-primary">
+                  {review.userId.username}
+                </a>
+              </h5>
+              {review.rating && (
+                <h6 className="card-subtitle mb-2 text-muted">
+                  Rating: {review.rating}
+                </h6>
+              )}
+              <p className="card-text">{review.comment}</p>
+            </div>
           </div>
         ))}
+        <div id="reviewsSection" className="submit-comment-form mt-4">
+          <h2 className="mb-3">Leave a Comment</h2>
+          <SubmitCommentForm
+            movieId={id}
+            onCommentSubmit={handleCommentSubmit}
+          />
+        </div>
       </div>
-      {console.log("reviews 999:", reviews)}
-      <SubmitCommentForm movieId={id} onCommentSubmit={handleCommentSubmit} />
-      {/* 评论列表 */}
     </div>
   );
 }

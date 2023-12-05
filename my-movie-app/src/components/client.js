@@ -158,3 +158,8 @@ export const getUserRatings = async (userId) => {
     throw error;
   }
 };
+
+export const createComment = async (commentData) => {
+  const response = await request.post(`${BASE_API}/api/comments`, commentData);
+  return response.data;
+};
