@@ -15,6 +15,9 @@ function Profile() {
   const [confirmNewPassword, setConfirmNewPassword] = useState("");
   const [userRatings, setUserRatings] = useState([]);
   const [watchList, setWatchList] = useState([]);
+  const [userComments, setUserComments] = useState([]);
+  const [editedText, setEditedText] = useState("");
+  const [editModeReview, setEditModeReview] = useState({});
 
   useEffect(() => {
     console.log("auth.user:", auth.user);
@@ -32,18 +35,6 @@ function Profile() {
 
     fetchUserData();
 
-    // user rating
-    // const fetchUserRatings = async () => {
-    //   if (auth.user && auth.user._id) {
-    //     try {
-    //       const ratings = await client.getUserRatings(auth.user._id);
-    //       console.log("ratings:", ratings);
-    //       setUserRatings(ratings);
-    //     } catch (error) {
-    //       console.error("Error fetching user ratings:", error);
-    //     }
-    //   }
-    // };
     const fetchUserRatings = async () => {
       if (auth.user && auth.user._id) {
         try {
@@ -73,7 +64,39 @@ function Profile() {
       }
     };
 
-    fetchUserRatings();
+    const fetchUserComments = async () => {
+      if (auth.user._id) {
+        try {
+          const comments = await client.getUserComments(auth.user._id);
+
+          const commentsWithMovieDetails = await Promise.all(
+            comments.map(async (comment) => {
+              try {
+                const movieDetails = await client.getMovieDetails(
+                  comment.movieId
+                );
+                return { ...comment, movieDetails };
+              } catch (error) {
+                console.error(
+                  `Error fetching details for movie ${comment.movieId}:`,
+                  error
+                );
+                return { ...comment, movieDetails: null };
+              }
+            })
+          );
+
+          setUserComments(commentsWithMovieDetails);
+        } catch (error) {
+          console.error("Error fetching user comments:", error);
+        }
+      }
+    };
+
+    if (auth.user && auth.user._id) {
+      fetchUserRatings();
+      fetchUserComments();
+    }
 
     //watchlist
     const fetchFavoritesData = async () => {
@@ -97,22 +120,22 @@ function Profile() {
     fetchFavoritesData();
   }, [auth.user]);
 
-  const fetchUserRatings = async () => {
-    if (auth.user && auth.user._id) {
-      try {
-        const ratings = await client.getUserRatings(auth.user._id);
-        const ratingsWithDetails = await Promise.all(
-          ratings.map(async (rating) => {
-            const movieDetails = await client.getMovieDetails(rating.movieId);
-            return { ...rating, movieDetails };
-          })
-        );
-        setUserRatings(ratingsWithDetails);
-      } catch (error) {
-        console.error("Error fetching user ratings:", error);
-      }
-    }
-  };
+  // const fetchUserRatings = async () => {
+  //   if (auth.user && auth.user._id) {
+  //     try {
+  //       const ratings = await client.getUserRatings(auth.user._id);
+  //       const ratingsWithDetails = await Promise.all(
+  //         ratings.map(async (rating) => {
+  //           const movieDetails = await client.getMovieDetails(rating.movieId);
+  //           return { ...rating, movieDetails };
+  //         })
+  //       );
+  //       setUserRatings(ratingsWithDetails);
+  //     } catch (error) {
+  //       console.error("Error fetching user ratings:", error);
+  //     }
+  //   }
+  // };
 
   const handleUpdate = async (event) => {
     event.preventDefault();
@@ -152,6 +175,72 @@ function Profile() {
     }
   };
 
+  const handleDeleteComment = async (commentId) => {
+    try {
+      await client.deleteComment(commentId);
+      const updatedComments = userComments.filter(
+        (comment) => comment._id !== commentId
+      );
+      setUserComments(updatedComments);
+      alert("Comment deleted successfully.");
+    } catch (error) {
+      console.error("Error deleting comment:", error);
+      alert("Failed to delete comment.");
+    }
+  };
+
+  const handleEditClick = (commentId) => {
+    setEditedText(
+      userComments.find((comment) => comment._id === commentId).comment
+    );
+    setEditModeReview((prevModes) => ({
+      ...prevModes,
+      [commentId]: true,
+    }));
+  };
+
+  const handleEditComment = async (commentId, updatedText) => {
+    try {
+      await client.updateComment(commentId, { text: updatedText });
+      const updatedComments = userComments.map((comment) =>
+        comment._id === commentId ? { ...comment, text: updatedText } : comment
+      );
+      setUserComments(updatedComments);
+      alert("Comment updated successfully.");
+    } catch (error) {
+      console.error("Error updating comment:", error);
+      alert("Failed to update comment.");
+    }
+  };
+
+  const handleSaveComment = async (commentId) => {
+    try {
+      console.log("Saving comment:", commentId, editedText);
+      const updatedCommentData = { comment: editedText };
+      const response = await client.updateComment(
+        commentId,
+        updatedCommentData
+      );
+      const updatedComment = response.updatedComment;
+
+      const updatedComments = userComments.map((comment) =>
+        comment._id === commentId ? { ...comment, ...updatedComment } : comment
+      );
+      setUserComments(updatedComments);
+
+      setEditModeReview((prevModes) => ({
+        ...prevModes,
+        [commentId]: false,
+      }));
+      setEditedText("");
+
+      alert("Comment updated successfully.");
+    } catch (error) {
+      console.error("Error updating comment:", error);
+      alert("Failed to update comment.");
+    }
+  };
+
   return (
     <div className="profile-container">
       <h1>User Profile</h1>
@@ -179,6 +268,12 @@ function Profile() {
           onClick={() => setActiveTab("ratings")}
         >
           Ratings
+        </button>
+        <button
+          className={activeTab === "reviews" ? "active" : ""}
+          onClick={() => setActiveTab("reviews")}
+        >
+          Reviews
         </button>
       </div>
       <div className="profile-details">
@@ -304,6 +399,82 @@ function Profile() {
               </div>
             ) : (
               <p>No ratings available.</p>
+            )}
+          </div>
+        )}
+        {activeTab === "reviews" && (
+          <div className="reviews-section">
+            <h5>My Reviews</h5>
+            {userComments.length > 0 ? (
+              <ul className="user-comments-list">
+                {userComments.map((comment) => (
+                  <li key={comment._id} className="comment-item">
+                    {console.log("Rendering comment:", comment)}
+                    <Link to={`/movie/${comment.movieId}`}>
+                      {comment.movieDetails && (
+                        <img
+                          src={`https://image.tmdb.org/t/p/w154/${comment.movieDetails.poster_path}`}
+                          alt={comment.movieDetails.title}
+                          className="movie-poster"
+                        />
+                      )}
+                    </Link>
+                    <div>
+                      <h6>
+                        {comment.movieDetails
+                          ? comment.movieDetails.title
+                          : "Movie Title"}
+                      </h6>
+                      {editModeReview[comment._id] ? (
+                        <>
+                          <input
+                            type="text"
+                            value={editedText}
+                            onChange={(e) => setEditedText(e.target.value)}
+                          />
+                          <button
+                            onClick={() => handleSaveComment(comment._id)}
+                          >
+                            Save
+                          </button>
+                          <button
+                            onClick={() =>
+                              setEditModeReview((prevModes) => ({
+                                ...prevModes,
+                                [comment._id]: false,
+                              }))
+                            }
+                          >
+                            Cancel
+                          </button>
+                        </>
+                      ) : (
+                        <>
+                          <p className="comment-text">{comment.comment}</p>
+                          <button
+                            onClick={() => {
+                              setEditedText(comment.comment);
+                              setEditModeReview((prevModes) => ({
+                                ...prevModes,
+                                [comment._id]: true,
+                              }));
+                            }}
+                          >
+                            Edit
+                          </button>
+                          <button
+                            onClick={() => handleDeleteComment(comment._id)}
+                          >
+                            Delete
+                          </button>
+                        </>
+                      )}
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p>No comments available.</p>
             )}
           </div>
         )}

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
 import "../../styles/main.css";
 import "./index.css";
 import { FaPen, FaStar, FaPlus, FaPlay } from "react-icons/fa";
@@ -447,9 +447,12 @@ function MovieDetails() {
           <div key={review._id} className="card mb-3">
             <div className="card-body">
               <h5 className="card-title">
-                <a href={`/user/${review.userId}`} className="text-primary">
+                <Link
+                  to={`/user/${review.userId._id}`}
+                  className="text-primary"
+                >
                   {review.userId.username}
-                </a>
+                </Link>
               </h5>
               {review.rating && (
                 <h6 className="card-subtitle mb-2 text-muted">

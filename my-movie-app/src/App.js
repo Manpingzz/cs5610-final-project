@@ -24,7 +24,7 @@ import PersonDetails from "./components/PersonDetails";
 import TVShowDetails from "./components/TVShowDetails/TVShowDetails";
 import { AuthProvider } from "./context/AuthContext";
 import { WatchlistProvider } from "./components/WatchlistContext";
-import "bootstrap/dist/css/bootstrap.min.css";
+import UserProfile from "./components/UserProfile/UserProfile";
 
 function App() {
   const [searchResults, setSearchResults] = useState([]);
@@ -68,6 +68,7 @@ function App() {
               <Route path="/movie/:id" element={<MovieDetails />} />
               <Route path="/people/:id" element={<PersonDetails />} />
               <Route path="/tv/:id" element={<TVShowDetails />} />
+              <Route path="/user/:username" element={<UserProfile />} />
 
               {/* <Route
             path="/search"

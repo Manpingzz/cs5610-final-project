@@ -163,3 +163,40 @@ export const createComment = async (commentData) => {
   const response = await request.post(`${BASE_API}/api/comments`, commentData);
   return response.data;
 };
+
+export const getUserComments = async (userId) => {
+  try {
+    const response = await axios.get(`${BASE_API}/api/comments/user/${userId}`);
+    console.log("User comments:", response.data);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching user comments:", error);
+    throw error;
+  }
+};
+
+export const deleteComment = async (commentId) => {
+  try {
+    const response = await axios.delete(
+      `${BASE_API}/api/comments/${commentId}`
+    );
+    return response.data; // response.status === 200
+  } catch (error) {
+    console.error("Error deleting comment:", error);
+    throw error;
+  }
+};
+
+export const updateComment = async (commentId, commentData) => {
+  try {
+    console.log(`Updating comment at /api/comments/${commentId}`, commentData);
+    const response = await axios.put(
+      `${BASE_API}/api/comments/${commentId}`,
+      commentData
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error updating comment:", error);
+    throw error;
+  }
+};
