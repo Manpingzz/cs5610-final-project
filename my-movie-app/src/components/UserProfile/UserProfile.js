@@ -6,88 +6,78 @@ import "./index.css";
 import { Tab, Nav } from "react-bootstrap";
 
 function UserProfile() {
-  const { auth } = useContext(AuthContext);
-
   const { username } = useParams();
   const [userData, setUserData] = useState(null);
   const [userRatings, setUserRatings] = useState([]);
   const [userComments, setUserComments] = useState([]);
 
-  useEffect(() => {
-    const fetchUserData = async () => {
-      try {
-        const data = await client.getUserData(auth.user.username);
-        console.log("data1205:", data);
-        setUserData(data);
-      } catch (error) {
-        console.error("Error fetching user data:", error);
-      }
-    };
-
-    fetchUserData();
-    const fetchUserRatings = async () => {
-      if (auth.user && auth.user._id) {
-        try {
-          const ratings = await client.getUserRatings(auth.user._id);
-
-          const ratingsWithDetails = await Promise.all(
-            ratings.map(async (rating) => {
-              try {
-                const movieDetails = await client.getMovieDetails(
-                  rating.movieId
-                );
-                return { ...rating, movieDetails };
-              } catch (error) {
-                console.error(
-                  `Error fetching details for movie ${rating.movieId}:`,
-                  error
-                );
-                return { ...rating, movieDetails: null };
-              }
-            })
-          );
-
-          setUserRatings(ratingsWithDetails);
-        } catch (error) {
-          console.error("Error fetching user ratings:", error);
-        }
-      }
-    };
-
-    const fetchUserComments = async () => {
-      if (auth.user._id) {
-        try {
-          const comments = await client.getUserComments(auth.user._id);
-
-          const commentsWithMovieDetails = await Promise.all(
-            comments.map(async (comment) => {
-              try {
-                const movieDetails = await client.getMovieDetails(
-                  comment.movieId
-                );
-                return { ...comment, movieDetails };
-              } catch (error) {
-                console.error(
-                  `Error fetching details for movie ${comment.movieId}:`,
-                  error
-                );
-                return { ...comment, movieDetails: null };
-              }
-            })
-          );
-
-          setUserComments(commentsWithMovieDetails);
-        } catch (error) {
-          console.error("Error fetching user comments:", error);
-        }
-      }
-    };
-
-    if (auth.user && auth.user._id) {
-      fetchUserRatings();
-      fetchUserComments();
+  const fetchUserData = async () => {
+    try {
+      const data = await client.getUserDataByUsername(username);
+      setUserData(data);
+    } catch (error) {
+      console.error("Error fetching user data:", error);
     }
-  }, [auth.user]);
+  };
+
+  const fetchUserRatings = async (userId) => {
+    try {
+      const ratings = await client.getUserRatings(userId);
+      const ratingsWithDetails = await Promise.all(
+        ratings.map(async (rating) => {
+          try {
+            const movieDetails = await client.getMovieDetails(rating.movieId);
+            return { ...rating, movieDetails };
+          } catch (error) {
+            console.error(
+              `Error fetching details for movie ${rating.movieId}:`,
+              error
+            );
+            return { ...rating, movieDetails: null };
+          }
+        })
+      );
+      setUserRatings(ratingsWithDetails);
+    } catch (error) {
+      console.error("Error fetching user ratings:", error);
+    }
+  };
+
+  const fetchUserComments = async (userId) => {
+    try {
+      const comments = await client.getUserComments(userId);
+      const commentsWithMovieDetails = await Promise.all(
+        comments.map(async (comment) => {
+          try {
+            const movieDetails = await client.getMovieDetails(comment.movieId);
+            return { ...comment, movieDetails };
+          } catch (error) {
+            console.error(
+              `Error fetching details for movie ${comment.movieId}:`,
+              error
+            );
+            return { ...comment, movieDetails: null };
+          }
+        })
+      );
+      setUserComments(commentsWithMovieDetails);
+    } catch (error) {
+      console.error("Error fetching user comments:", error);
+    }
+  };
+
+  useEffect(() => {
+    if (username) {
+      fetchUserData();
+    }
+  }, [username]);
+
+  useEffect(() => {
+    if (userData && userData._id) {
+      fetchUserRatings(userData._id);
+      fetchUserComments(userData._id);
+    }
+  }, [userData]);
 
   if (!userData) {
     return <div>Loading...</div>;
@@ -119,13 +109,13 @@ function UserProfile() {
                         className="d-flex align-items-center"
                       >
                         <img
-                          src={`https://image.tmdb.org/t/p/w185/${rating.movieDetails.poster_path}`}
-                          alt={rating.movieDetails.title}
+                          src={`https://image.tmdb.org/t/p/w185/${rating.movieDetails?.poster_path}`}
+                          alt={rating.movieDetails?.title}
                           className="me-2"
                           style={{ width: "180px", height: "auto" }}
                         />
                         <div>
-                          <h6>{rating.movieDetails.title}</h6>
+                          <h6>{rating.movieDetails?.title}</h6>
                           <p>
                             Rating:{" "}
                             <span className="badge bg-primary">

@@ -200,3 +200,14 @@ export const updateComment = async (commentId, commentData) => {
     throw error;
   }
 };
+export const getUserDataByUsername = async (username) => {
+  console.log("API URL being called:", `${USERS_API}/username/${username}`);
+  try {
+    const response = await request.get(`${USERS_API}/username/${username}`);
+    console.log("Received user data by username:", response.data);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching user data by username:", error);
+    throw error;
+  }
+};

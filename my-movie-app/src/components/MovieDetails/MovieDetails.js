@@ -448,7 +448,7 @@ function MovieDetails() {
             <div className="card-body">
               <h5 className="card-title">
                 <Link
-                  to={`/user/${review.userId._id}`}
+                  to={`/user/${review.userId.username}`}
                   className="text-primary"
                 >
                   {review.userId.username}
