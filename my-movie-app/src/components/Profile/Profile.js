@@ -6,7 +6,7 @@ import "./index.css";
 
 function Profile() {
   const { auth } = useContext(AuthContext);
-  console.log("AuthContext:", auth);
+  // console.log("AuthContext:", auth);
 
   const [userData, setUserData] = useState({});
   const [editMode, setEditMode] = useState(false);
@@ -20,7 +20,8 @@ function Profile() {
   const [editModeReview, setEditModeReview] = useState({});
 
   useEffect(() => {
-    console.log("auth.user:", auth.user);
+    console.log("Profile component mounted or auth.user changed");
+    // console.log("auth.user:", auth.user);
 
     const fetchUserData = async () => {
       if (auth.user && auth.user.username) {
@@ -32,8 +33,6 @@ function Profile() {
         }
       }
     };
-
-    fetchUserData();
 
     const fetchUserRatings = async () => {
       if (auth.user && auth.user._id) {
@@ -65,7 +64,7 @@ function Profile() {
     };
 
     const fetchUserComments = async () => {
-      if (auth.user._id) {
+      if (auth.user && auth.user._id) {
         try {
           const comments = await client.getUserComments(auth.user._id);
 
@@ -93,49 +92,39 @@ function Profile() {
       }
     };
 
-    if (auth.user && auth.user._id) {
-      fetchUserRatings();
-      fetchUserComments();
-    }
-
-    //watchlist
     const fetchFavoritesData = async () => {
+      console.log("fetchFavoritesData called");
       if (auth.user && auth.user.favorites) {
         try {
           const favorites = auth.user.favorites;
-          console.log("favorites:", favorites);
+          console.log("Fetched favorites from auth.user:", favorites);
+
           const favoritesInfo = await Promise.all(
             favorites.map(async (movieId) => {
               const movieData = await client.getMovieDetails(movieId);
-              console.log("movieData:", movieData);
+              console.log(`Fetched movie data for ID ${movieId}:`, movieData);
               return movieData;
             })
           );
+          console.log("Processed favorites info:", favoritesInfo);
           setWatchList(favoritesInfo);
+          console.log("Updated watchList state:", favoritesInfo);
         } catch (error) {
           console.error("Error fetching favorites data:", error);
         }
+      } else {
+        console.log(
+          "No favorites found in auth.user or auth.user is undefined"
+        );
       }
     };
+
+    fetchUserData();
+    fetchUserRatings();
+    fetchUserComments();
+
     fetchFavoritesData();
   }, [auth.user]);
-
-  // const fetchUserRatings = async () => {
-  //   if (auth.user && auth.user._id) {
-  //     try {
-  //       const ratings = await client.getUserRatings(auth.user._id);
-  //       const ratingsWithDetails = await Promise.all(
-  //         ratings.map(async (rating) => {
-  //           const movieDetails = await client.getMovieDetails(rating.movieId);
-  //           return { ...rating, movieDetails };
-  //         })
-  //       );
-  //       setUserRatings(ratingsWithDetails);
-  //     } catch (error) {
-  //       console.error("Error fetching user ratings:", error);
-  //     }
-  //   }
-  // };
 
   const handleUpdate = async (event) => {
     event.preventDefault();
@@ -346,31 +335,47 @@ function Profile() {
             </button>
           </div>
         )}
+        {activeTab === "watchlist" &&
+          console.log("Rendering watchlist with data:", watchList)}
         {activeTab === "watchlist" && (
           <div className="watchlist-section">
-            {watchList.map((movie) => (
-              <Link
-                to={`/movie/${movie.id}`}
-                key={movie.id}
-                className="watch-movie-card-link"
-              >
-                <div className="watch-movie-card">
-                  <img
-                    src={`https://image.tmdb.org/t/p/w500/${movie.poster_path}`}
-                    alt={movie.title}
-                    className="watch-movie-image"
-                  />
-                  <div className="movie-info">
-                    <h3>{movie.title}</h3>
-                    <p>{movie.release_date}</p>
-                    <p>
-                      <span className="star-icon">⭐</span> {movie.vote_average}
-                    </p>
-                    {/* <p>{movie.overview}</p> */}
+            {watchList.map((movie) => {
+              // 检查电影对象是否包含所有必要属性
+              if (
+                !movie.id ||
+                !movie.poster_path ||
+                !movie.title ||
+                !movie.release_date ||
+                !movie.vote_average
+              ) {
+                console.error("Missing properties in movie object:", movie);
+                return null; // 如果缺少属性，则不渲染该电影卡片
+              }
+
+              return (
+                <Link
+                  to={`/movie/${movie.id}`}
+                  key={movie.id}
+                  className="watch-movie-card-link"
+                >
+                  <div className="watch-movie-card">
+                    <img
+                      src={`https://image.tmdb.org/t/p/w500/${movie.poster_path}`}
+                      alt={movie.title}
+                      className="watch-movie-image"
+                    />
+                    <div className="movie-info">
+                      <h3>{movie.title}</h3>
+                      <p>{movie.release_date}</p>
+                      <p>
+                        <span className="star-icon">⭐</span>{" "}
+                        {movie.vote_average}
+                      </p>
+                    </div>
                   </div>
-                </div>
-              </Link>
-            ))}
+                </Link>
+              );
+            })}
           </div>
         )}
 

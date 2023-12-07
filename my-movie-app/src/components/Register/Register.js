@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import "./index.css";
 import * as client from "../client";
@@ -10,7 +11,9 @@ function Register() {
     email: "",
     firstName: "",
     lastName: "",
+    role: "USER",
   });
+  const navigate = useNavigate();
   const [error, setError] = useState("");
 
   const handleInputChange = (e) => {
@@ -28,9 +31,8 @@ function Register() {
         firstName: credentials.firstName,
         lastName: credentials.lastName,
       });
-      // 处理注册成功的情况，例如重定向到登录页面
+      navigate("/login");
     } catch (err) {
-      // 处理注册失败的情况
       setError(err.message || "Signup failed.");
     }
   };
@@ -77,13 +79,35 @@ function Register() {
 
         <input
           type="text"
-          name="lastname"
+          name="lastName"
           value={credentials.lastName}
           onChange={handleInputChange}
           placeholder="Last Name"
           required
         />
 
+        <div className="role-selection">
+          <label>
+            <input
+              type="radio"
+              name="role"
+              value="USER"
+              checked={credentials.role === "USER"}
+              onChange={handleInputChange}
+            />
+            User
+          </label>
+          <label>
+            <input
+              type="radio"
+              name="role"
+              value="CRITIC"
+              checked={credentials.role === "CRITIC"}
+              onChange={handleInputChange}
+            />
+            Critic
+          </label>
+        </div>
         <button type="submit" className="register-btn">
           Sign Up
         </button>

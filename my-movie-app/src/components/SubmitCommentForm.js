@@ -37,11 +37,22 @@ function SubmitCommentForm({ movieId, onCommentSubmit }) {
           }),
         }
       );
+      console.log("Request data for comment submission:", {
+        movieId,
+        commentText,
+        userId: user._id,
+      });
 
+      console.log("Response status after submission:", response.status);
       if (response.ok) {
+        const responseData = await response.json();
+        console.log("Comment submission response data:", responseData);
+
         console.log("Comment submitted successfully");
         setCommentText("");
-        onCommentSubmit();
+        if (onCommentSubmit) {
+          onCommentSubmit(responseData);
+        }
       } else {
         console.error(
           "Error submitting comment, response status:",

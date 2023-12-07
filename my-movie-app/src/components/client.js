@@ -10,10 +10,31 @@ export const USERS_API = `${BASE_API}/api/users`;
 const BASE_URL = "https://api.themoviedb.org/3";
 const API_KEY = process.env.REACT_APP_TMBD_API_KEY;
 
+// export const signin = async (credentials) => {
+//   const response = await request.post(`${USERS_API}/signin`, credentials);
+//   return response.data;
+// };
+
 export const signin = async (credentials) => {
-  const response = await request.post(`${USERS_API}/signin`, credentials);
-  return response.data;
+  try {
+    const response = await request.post(`${USERS_API}/signin`, credentials);
+
+    // 检查响应中是否有 JWT
+    const { token } = response.data;
+    if (token) {
+      // 保存 JWT 到 localStorage
+      localStorage.setItem("jwtToken", token);
+    } else {
+      console.error("No token received");
+    }
+
+    return response.data;
+  } catch (error) {
+    console.error("Error during signin:", error);
+    throw error;
+  }
 };
+
 export const signout = async () => {
   const response = await request.post(`${USERS_API}/signout`);
   return response.data;
@@ -135,7 +156,7 @@ export const getMovieDetails = async (movieId) => {
   try {
     const url = `${BASE_URL}/movie/${movieId}?api_key=${API_KEY}`;
     const response = await axios.get(url);
-    console.log("getMovieDetails:", response);
+    // console.log("getMovieDetails:", response);
 
     if (response.status === 200) {
       return response.data;
@@ -151,7 +172,7 @@ export const getMovieDetails = async (movieId) => {
 export const getUserRatings = async (userId) => {
   try {
     const response = await request.get(`${BASE_API}/api/userRatings/${userId}`);
-    console.log("Received user ratings:", response.data);
+    // console.log("Received user ratings:", response.data);
     return response.data;
   } catch (error) {
     console.error("Error fetching user ratings:", error);
@@ -175,12 +196,42 @@ export const getUserComments = async (userId) => {
   }
 };
 
+// export const deleteComment = async (commentId) => {
+//   try {
+//     const token = localStorage.getItem("jwtToken");
+//     const response = await axios.delete(
+//       `${BASE_API}/api/comments/${commentId}`,
+//       {
+//         headers: {
+//           Authorization: `Bearer ${token}`, // 将 JWT 添加到请求头部
+//         },
+//       }
+//     );
+//     return response.data; // response.status === 200
+//   } catch (error) {
+//     console.error("Error deleting comment:", error);
+//     throw error;
+//   }
+// };
+
 export const deleteComment = async (commentId) => {
   try {
+    const token = localStorage.getItem("jwtToken"); // 从存储中获取 JWT
+    console.log("JWT from storage:", token); // 调试语句，检查 JWT
+
+    if (!token) {
+      throw new Error("No token found");
+    }
+
     const response = await axios.delete(
-      `${BASE_API}/api/comments/${commentId}`
+      `${BASE_API}/api/comments/${commentId}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`, // 将 JWT 添加到请求头部
+        },
+      }
     );
-    return response.data; // response.status === 200
+    return response.data;
   } catch (error) {
     console.error("Error deleting comment:", error);
     throw error;

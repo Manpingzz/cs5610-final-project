@@ -8,7 +8,7 @@ import { AuthContext } from "../../context/AuthContext";
 import * as client from "../client.js";
 import { Modal, Button } from "react-bootstrap";
 import { faStar } from "react-icons/fa";
-
+import withAuth from "../withAuth.js";
 export const BASE_URL = "https://api.themoviedb.org/3";
 export const API_KEY = process.env.REACT_APP_TMBD_API_KEY;
 
@@ -42,7 +42,8 @@ const StarRating = ({ onRatingSelected }) => {
 
 function MovieDetails() {
   // const { user } = useContext(AuthContext);
-  const { auth } = useContext(AuthContext);
+  const { auth, setAuth } = useContext(AuthContext);
+  // const { auth } = useContext(AuthContext);
   const user = auth.user;
   const [watchlist, setWatchlist] = useState([]);
   const [isAlreadyInWatchlist, setIsAlreadyInWatchlist] = useState(false);
@@ -84,6 +85,7 @@ function MovieDetails() {
             movieId: id,
             userId: user._id,
             rating,
+            comment: commentText || "No comment",
           }),
         }
       );
@@ -141,10 +143,19 @@ function MovieDetails() {
       try {
         const response = await client.addToWatchlist(user._id, movie.id);
         console.log("Movie added to watch list successfully", response);
-        setWatchlist([...watchlist, movie]);
+
+        const movieDetails = await client.getMovieDetails(movie.id);
+        setWatchlist([...watchlist, movieDetails]);
         setIsAlreadyInWatchlist(false);
         setShowAddSuccess(true);
         setTimeout(() => setShowAddSuccess(false), 3000);
+        setAuth((prevAuth) => ({
+          ...prevAuth,
+          user: {
+            ...prevAuth.user,
+            favorites: [...prevAuth.user.favorites, movie.id],
+          },
+        }));
       } catch (error) {
         console.error("Error adding movie to watch list:", error);
       }
@@ -286,18 +297,27 @@ function MovieDetails() {
       userId,
       token,
     });
-    console.log("Current user1204:", user);
-    console.log("User ID1204:", user?._id);
 
-    const requestData = {
-      movieId: id,
-      comment: commentText,
-      userId: user?._id,
-    };
-
-    console.log("Submitting comment with data:", requestData);
+    if (!movieId || !commentText || !userId || !token) {
+      console.error("Missing parameters in handleCommentSubmit", {
+        movieId,
+        commentText,
+        userId,
+        token,
+      });
+      return;
+    }
 
     try {
+      const requestData = {
+        movieId: movieId,
+        comment: commentText,
+        userId: userId,
+      };
+      console.log("commentText:", commentText, "Type:", typeof commentText);
+
+      console.log("Preparing to submit comment with data:", requestData);
+
       console.log("Submitting comment...");
       const response = await fetch(
         `${process.env.REACT_APP_BASE_API_URL}/api/comments`,
@@ -305,23 +325,97 @@ function MovieDetails() {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${auth.token}`,
+            Authorization: `Bearer ${token}`,
           },
           body: JSON.stringify(requestData),
         }
       );
+
       console.log("Response status:", response.status);
 
       if (response.ok) {
         const newComment = await response.json();
-        setReviews([...reviews, newComment]);
-
-        console.log("Comment submitted successfully:", newComment);
+        setReviews((prevReviews) => {
+          const updatedReviews = [...prevReviews, newComment];
+          console.log("Updated reviews:", updatedReviews);
+          return updatedReviews;
+        });
       } else {
-        console.error("Error submitting comment");
+        console.error(
+          "Error submitting comment, response status:",
+          response.status
+        );
+        const errorResponse = await response.json();
+        console.error("Error details:", errorResponse);
       }
     } catch (error) {
       console.error("Error submitting comment:", error);
+    }
+  };
+
+  // const handleCommentSubmit = async (movieId, commentText, userId, token) => {
+  //   console.log("handleCommentSubmit called with:", {
+  //     movieId,
+  //     commentText,
+  //     userId,
+  //     token,
+  //   });
+  //   console.log("Current user1204:", user);
+  //   console.log("User ID1204:", user?._id);
+
+  //   const requestData = {
+  //     movieId: id,
+  //     comment: commentText,
+  //     userId: user?._id,
+  //   };
+
+  //   console.log("Submitting comment with data:", requestData);
+
+  //   try {
+  //     console.log("Submitting comment...");
+  //     const response = await fetch(
+  //       `${process.env.REACT_APP_BASE_API_URL}/api/comments`,
+  //       {
+  //         method: "POST",
+  //         headers: {
+  //           "Content-Type": "application/json",
+  //           Authorization: `Bearer ${auth.token}`,
+  //         },
+  //         body: JSON.stringify(requestData),
+  //       }
+  //     );
+  //     console.log("Response status:", response.status);
+
+  //     if (response.ok) {
+  //       const newComment = await response.json();
+  //       setReviews([...reviews, newComment]);
+
+  //       console.log("Comment submitted successfully:", newComment);
+  //     } else {
+  //       console.error("Error submitting comment");
+  //     }
+  //   } catch (error) {
+  //     console.error("Error submitting comment:", error);
+  //   }
+  // };
+
+  const handleDeleteComment = async (commentId) => {
+    if (!window.confirm("Are you sure you want to delete this comment?")) {
+      return;
+    }
+
+    try {
+      await client.deleteComment(commentId);
+
+      const updatedReviews = reviews.filter(
+        (comment) => comment._id !== commentId
+      );
+      setReviews(updatedReviews);
+
+      console.log("Comment deleted successfully");
+    } catch (error) {
+      console.error("Error deleting comment:", error);
+      alert("Failed to delete comment");
     }
   };
 
@@ -445,21 +539,31 @@ function MovieDetails() {
       <div className="reviews-container mt-4">
         {reviews.map((review) => (
           <div key={review._id} className="card mb-3">
-            <div className="card-body">
-              <h5 className="card-title">
-                <Link
-                  to={`/user/${review.userId.username}`}
-                  className="text-primary"
-                >
+            <div className="comment-content">
+              <h5 className="detail-card-title">
+                <Link to={`/user/${review.userId}`} className="text-primary">
                   {review.userId.username}
+                  {review.userId.role === "CRITIC" && (
+                    <span className="critic-badge">Critic</span>
+                    // <i className="fa fa-badge-critic"></i>
+                  )}
                 </Link>
               </h5>
+
               {review.rating && (
                 <h6 className="card-subtitle mb-2 text-muted">
                   Rating: {review.rating}
                 </h6>
               )}
-              <p className="card-text">{review.comment}</p>
+              <p className="detail-card-text">{review.comment}</p>
+              {(user._id === review.userId._id || user.role === "ADMIN") && (
+                <button
+                  onClick={() => handleDeleteComment(review._id)}
+                  className="delete-comment-btn"
+                >
+                  Delete Review
+                </button>
+              )}
             </div>
           </div>
         ))}
@@ -467,7 +571,15 @@ function MovieDetails() {
           <h2 className="mb-3">Leave a Comment</h2>
           <SubmitCommentForm
             movieId={id}
-            onCommentSubmit={handleCommentSubmit}
+            onCommentSubmit={(responseData) => {
+              console.log("Response data:", responseData);
+              const newComment = {
+                ...responseData,
+                user: { username: user.username, _id: user._id },
+              };
+              console.log("New comment:", newComment);
+              setReviews((prevReviews) => [...prevReviews, newComment]);
+            }}
           />
         </div>
       </div>
@@ -475,4 +587,5 @@ function MovieDetails() {
   );
 }
 
-export default MovieDetails;
+// export default MovieDetails;
+export default withAuth(MovieDetails);

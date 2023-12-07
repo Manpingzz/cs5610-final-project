@@ -68,35 +68,15 @@
   object-fit: cover;
 }
 
-.card-title {
-  font-size: 0.8rem; /* Adjust font size if necessary */
-}
-
-.card-text {
-  font-size: 0.7rem; /* Adjust font size if necessary */
-}
-
-/* Ensure that the card body has padding and the text is not too cramped */
-.card-body.p-2 {
-  padding: 0.5rem; /* Adjust padding if necessary */
-}
-
-/* Horizontal Scrolling for Cast Section */
-.cast-scrolling-container {
-  overflow-x: auto; /* Enable horizontal scrolling */
-  white-space: nowrap; /* Ensure the items line up horizontally */
-  -webkit-overflow-scrolling: touch; /* Smooth scrolling on touch devices */
-}
-
 .row.flex-nowrap {
-  flex-wrap: nowrap; /* Prevent wrapping of items */
+  flex-wrap: nowrap;
 }
 
 .card-cast {
-  display: inline-block; /* Display cards in a line */
-  width: 160px; /* Fixed width for each card */
-  white-space: normal; /* Override the white-space from the container */
-  margin-right: 15px; /* Space between cards */
+  display: inline-block;
+  width: 160px;
+  white-space: normal;
+  margin-right: 15px;
 }
 
 .card-img-top {
@@ -105,22 +85,23 @@
   object-fit: cover;
 }
 
-.card-body {
-  padding: 0.5rem; /* Padding inside the card */
+.detail-card-body {
+  display: flex;
+  padding: 0.5rem;
 }
 
-.card-title {
-  font-size: 0.9rem; /* Font size for actor's name */
-  margin-bottom: 0.2rem; /* Space below the actor's name */
+.detail-card-title {
+  font-size: 0.9rem;
+  margin-bottom: 0.2rem;
 }
 
-.card-text {
-  font-size: 0.8rem; /* Font size for character's name */
+.detail-card-text {
+  font-size: 0.8rem;
 }
 
 .cast-scrolling-container {
-  overflow-x: auto; /* Enables horizontal scrolling */
-  white-space: nowrap; /* Keeps the cast cards on a single line */
+  overflow-x: auto;
+  white-space: nowrap;
 }
 .cast-scrolling-container::-webkit-scrollbar {
   height: 8px;
@@ -159,5 +140,26 @@
 .btn-rate:hover,
 .btn-favourite:hover,
 .btn-trailer:hover {
-  background-color: rgb(131, 18, 245); /* Darker shade for hover state */
+  background-color: rgb(131, 18, 245);
+}
+
+.delete-comment-btn {
+  background-color: red;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  cursor: pointer;
+}
+
+.delete-comment-btn:hover {
+  background-color: darkred;
+}
+
+.critic-badge {
+  margin-left: 2px;
+  background-color: gold;
+  color: black;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-weight: bold;
 }
