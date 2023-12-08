@@ -85,8 +85,10 @@ function UserProfile() {
 
   return (
     <div className="user-profile-container mt-4">
-      <h1>Username: {userData.username}</h1>
-
+      <h1>User Info</h1>
+      <br />
+      <h3>Username: {userData.username}</h3>
+      <br />
       <Tab.Container defaultActiveKey="ratings">
         <Nav variant="tabs" className="mb-3">
           <Nav.Item>

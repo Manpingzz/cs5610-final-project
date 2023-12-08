@@ -541,7 +541,10 @@ function MovieDetails() {
           <div key={review._id} className="card mb-3">
             <div className="comment-content">
               <h5 className="detail-card-title">
-                <Link to={`/user/${review.userId}`} className="text-primary">
+                <Link
+                  to={`/user/${review.userId.username}`}
+                  className="text-primary"
+                >
                   {review.userId.username}
                   {review.userId.role === "CRITIC" && (
                     <span className="critic-badge">Critic</span>
