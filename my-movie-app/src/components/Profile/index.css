@@ -1,9 +1,9 @@
 .profile-container {
   padding: 10px;
-  max-width: 1200px;
-  margin: 10px auto; /* 增加顶部和底部的边距 */
-  background-color: #fff; /* 设置背景颜色为白色 */
-  border-radius: 8px; /* 给容器添加圆角 */
+  max-width: 1300px;
+  margin: 10px auto;
+  background-color: #fff;
+  border-radius: 8px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
@@ -78,8 +78,8 @@
 }
 
 .watch-movie-image {
-  width: 100%; /* 图片宽度充满卡片 */
-  height: 220px; /* 图片高度自动调整 */
+  width: 100%;
+  height: 220px;
   display: block;
   object-fit: cover;
 }
@@ -104,6 +104,12 @@
 
 .btn {
   background-color: rgb(200, 157, 243);
+}
+.btn-edit {
+  background-color: rgb(200, 157, 243);
+}
+.btn-danger {
+  background-color: red;
 }
 
 @media (max-width: 600px) {

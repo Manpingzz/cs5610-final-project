@@ -44,6 +44,9 @@ function MovieDetails() {
   // const { user } = useContext(AuthContext);
   const { auth, setAuth } = useContext(AuthContext);
   // const { auth } = useContext(AuthContext);
+  useEffect(() => {
+    console.log("MovieDetails: 当前用户状态", auth);
+  }, [auth]);
   const user = auth.user;
   const [watchlist, setWatchlist] = useState([]);
   const [isAlreadyInWatchlist, setIsAlreadyInWatchlist] = useState(false);

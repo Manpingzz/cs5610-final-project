@@ -1,17 +1,3 @@
-// import React from "react";
-// import MovieList from "./MovieList/MovieList";
-// import TrendingMovies from "./TrendingMovies";
-// import PopularMovies from "./PopularMovies";
-
-// function Home({ searchResults }) {
-//   return (
-//     <div className="home">
-//       <TrendingMovies />
-//       <PopularMovies />
-//     </div>
-//   );
-// }
-
 import React from "react";
 import TrendingMovies from "./TrendingMovies";
 import PopularMovies from "./PopularMovies";

@@ -5,7 +5,7 @@
   gap: 20px;
 }
 
-.movie-list::-webkit-scrollbar {
+/* .movie-list::-webkit-scrollbar {
   height: 8px;
 }
 
@@ -16,4 +16,4 @@
 
 .movie-list::-webkit-scrollbar-track {
   background: white;
-}
+} */

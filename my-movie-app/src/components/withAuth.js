@@ -4,16 +4,17 @@ import { AuthContext } from "../context/AuthContext";
 
 const withAuth = (WrappedComponent) => {
   return (props) => {
-    const { auth } = useContext(AuthContext);
+    // const { auth } = useContext(AuthContext);
+    const { auth, isInitialized } = useContext(AuthContext);
     const navigate = useNavigate();
 
     useEffect(() => {
-      // 检查用户是否登录
-      if (!auth.user) {
-        // 用户未登录，重定向到登录页面
+      console.log("withAuth: 检查用户登录状态", auth);
+      if (isInitialized && !auth.user) {
+        console.log("withAuth: 用户未登录，重定向到登录页面");
         navigate("/login");
       }
-    }, [auth, navigate]);
+    }, [auth, navigate, isInitialized]);
 
     return <WrappedComponent {...props} />;
   };

@@ -103,31 +103,34 @@ function UserProfile() {
           <Tab.Pane eventKey="ratings">
             <div className="ratings-section mt-3">
               <ul className="list-unstyled">
-                {userRatings.length > 0 ? (
-                  userRatings.map((rating, index) => (
-                    <li key={index} className="mb-2">
-                      <Link
-                        to={`/movie/${rating.movieId}`}
-                        className="d-flex align-items-center"
-                      >
-                        <img
-                          src={`https://image.tmdb.org/t/p/w185/${rating.movieDetails?.poster_path}`}
-                          alt={rating.movieDetails?.title}
-                          className="me-2"
-                          style={{ width: "180px", height: "auto" }}
-                        />
-                        <div>
-                          <h6>{rating.movieDetails?.title}</h6>
-                          <p>
-                            Rating:{" "}
-                            <span className="badge bg-primary">
-                              {rating.rating}
-                            </span>
-                          </p>
-                        </div>
-                      </Link>
-                    </li>
-                  ))
+                {userRatings.filter((rating) => rating.rating > 0).length >
+                0 ? (
+                  userRatings
+                    .filter((rating) => rating.rating > 0)
+                    .map((rating, index) => (
+                      <li key={index} className="mb-2">
+                        <Link
+                          to={`/movie/${rating.movieId}`}
+                          className="d-flex align-items-center"
+                        >
+                          <img
+                            src={`https://image.tmdb.org/t/p/w185/${rating.movieDetails?.poster_path}`}
+                            alt={rating.movieDetails?.title}
+                            className="me-2"
+                            style={{ width: "180px", height: "auto" }}
+                          />
+                          <div>
+                            <h6>{rating.movieDetails?.title}</h6>
+                            <p>
+                              Rating:
+                              <span className="badge bg-primary">
+                                {rating.rating}
+                              </span>
+                            </p>
+                          </div>
+                        </Link>
+                      </li>
+                    ))
                 ) : (
                   <p>No ratings available.</p>
                 )}
@@ -139,27 +142,30 @@ function UserProfile() {
             <div className="comments-section mt-3">
               {userComments.length > 0 ? (
                 <ul className="user-comments-list">
-                  {userComments.map((comment, index) => (
-                    <li key={index} className="comment-item">
-                      <Link to={`/movie/${comment.movieId}`}>
-                        {comment.movieDetails && (
-                          <img
-                            src={`https://image.tmdb.org/t/p/w154/${comment.movieDetails.poster_path}`}
-                            alt={comment.movieDetails.title}
-                            className="movie-poster"
-                          />
-                        )}
-                      </Link>
-                      <div>
-                        <h6>{comment.movieDetails.title}</h6>
-                        <p></p>
-                        <h6>
-                          Review:
+                  {userComments
+                    .filter(
+                      (comment) =>
+                        comment.comment &&
+                        comment.comment.trim() !== "" &&
+                        comment.comment !== "No comment"
+                    )
+                    .map((comment, index) => (
+                      <li key={index} className="comment-item">
+                        <Link to={`/movie/${comment.movieId}`}>
+                          {comment.movieDetails && (
+                            <img
+                              src={`https://image.tmdb.org/t/p/w154/${comment.movieDetails.poster_path}`}
+                              alt={comment.movieDetails.title}
+                              className="movie-poster"
+                            />
+                          )}
+                        </Link>
+                        <div>
+                          <h6>{comment.movieDetails.title}</h6>
                           <p className="comment-text">{comment.comment}</p>
-                        </h6>
-                      </div>
-                    </li>
-                  ))}
+                        </div>
+                      </li>
+                    ))}
                 </ul>
               ) : (
                 <p>No comments available.</p>

@@ -232,7 +232,7 @@ function Profile() {
 
   return (
     <div className="profile-container">
-      <h1>User Profile</h1>
+      <h1>My Profile</h1>
       <div className="profile-tabs">
         <button
           className={activeTab === "personal" ? "active" : ""}
@@ -340,7 +340,6 @@ function Profile() {
         {activeTab === "watchlist" && (
           <div className="watchlist-section">
             {watchList.map((movie) => {
-              // 检查电影对象是否包含所有必要属性
               if (
                 !movie.id ||
                 !movie.poster_path ||
@@ -349,7 +348,7 @@ function Profile() {
                 !movie.vote_average
               ) {
                 console.error("Missing properties in movie object:", movie);
-                return null; // 如果缺少属性，则不渲染该电影卡片
+                return null;
               }
 
               return (
@@ -384,30 +383,32 @@ function Profile() {
             <h5>My Ratings</h5>
             {userRatings.length > 0 ? (
               <div>
-                {userRatings.map((rating, index) => (
-                  <div key={index} className="watch-movie-card">
-                    <Link to={`/movie/${rating.movieId}`}>
-                      <img
-                        src={`https://image.tmdb.org/t/p/w500/${rating.movieDetails.poster_path}`}
-                        alt={rating.movieDetails.title}
-                        className="watch-movie-image"
-                      />
-                      <div className="movie-info">
-                        <Link to={`/movie/${rating.movieId}`}>
-                          <h3>{rating.movieDetails.title}</h3>
-                        </Link>
-                        <p>Rating: {rating.rating}</p>
-                      </div>
-                    </Link>
-                  </div>
-                ))}
+                {userRatings
+                  .filter((rating) => rating.rating > 0)
+                  .map((rating, index) => (
+                    <div key={index} className="watch-movie-card">
+                      <Link to={`/movie/${rating.movieId}`}>
+                        <img
+                          src={`https://image.tmdb.org/t/p/w500/${rating.movieDetails.poster_path}`}
+                          alt={rating.movieDetails.title}
+                          className="watch-movie-image"
+                        />
+                        <div className="movie-info">
+                          <Link to={`/movie/${rating.movieId}`}>
+                            <h3>{rating.movieDetails.title}</h3>
+                          </Link>
+                          <p>Rating: {rating.rating}</p>
+                        </div>
+                      </Link>
+                    </div>
+                  ))}
               </div>
             ) : (
               <p>No ratings available.</p>
             )}
           </div>
         )}
-        {activeTab === "reviews" && (
+        {/* {activeTab === "reviews" && (
           <div className="reviews-section">
             <h5>My Reviews</h5>
             {userComments.length > 0 ? (
@@ -456,6 +457,7 @@ function Profile() {
                       ) : (
                         <>
                           <p className="comment-text">{comment.comment}</p>
+
                           <button
                             onClick={() => {
                               setEditedText(comment.comment);
@@ -481,6 +483,88 @@ function Profile() {
             ) : (
               <p>No comments available.</p>
             )}
+          </div>
+        )} */}
+        {activeTab === "reviews" && (
+          <div className="reviews-section">
+            <h5>My Reviews</h5>
+            <ul className="user-comments-list">
+              {userComments.map(
+                (comment) =>
+                  comment.comment &&
+                  comment.comment &&
+                  comment.comment.trim() !== "" &&
+                  comment.comment !== "No comment" && (
+                    <li key={comment._id} className="comment-item">
+                      <Link to={`/movie/${comment.movieId}`} className="mx-3">
+                        {comment.movieDetails && (
+                          <img
+                            src={`https://image.tmdb.org/t/p/w154/${comment.movieDetails.poster_path}`}
+                            alt={comment.movieDetails.title}
+                            className="movie-poster"
+                          />
+                        )}
+                      </Link>
+                      <div>
+                        <h6 className="mx-3">
+                          {comment.movieDetails
+                            ? comment.movieDetails.title
+                            : "Movie Title"}
+                        </h6>
+                        {editModeReview[comment._id] ? (
+                          <>
+                            <input
+                              type="text"
+                              value={editedText}
+                              onChange={(e) => setEditedText(e.target.value)}
+                            />
+                            <button
+                              onClick={() => handleSaveComment(comment._id)}
+                            >
+                              Save
+                            </button>
+                            <button
+                              onClick={() =>
+                                setEditModeReview((prevModes) => ({
+                                  ...prevModes,
+                                  [comment._id]: false,
+                                }))
+                              }
+                            >
+                              Cancel
+                            </button>
+                          </>
+                        ) : (
+                          <>
+                            <p className="comment-text mx-3">
+                              {comment.comment}
+                            </p>
+                            <br />
+                            <button
+                              className="btn-edit mx-2"
+                              onClick={() => {
+                                setEditedText(comment.comment);
+                                setEditModeReview((prevModes) => ({
+                                  ...prevModes,
+                                  [comment._id]: true,
+                                }));
+                              }}
+                            >
+                              Edit
+                            </button>
+                            <button
+                              className="btn-danger"
+                              onClick={() => handleDeleteComment(comment._id)}
+                            >
+                              Delete
+                            </button>
+                          </>
+                        )}
+                      </div>
+                    </li>
+                  )
+              )}
+            </ul>
           </div>
         )}
       </div>
