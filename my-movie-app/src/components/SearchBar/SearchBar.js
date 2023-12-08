@@ -13,7 +13,9 @@ function SearchBar({ onSearch }) {
     event.preventDefault();
     console.log("Searching for:", searchTerm);
     onSearch(searchTerm, searchType);
-    navigate("/search");
+    const searchUrl = `/search?criteria=${searchTerm}&type=${searchType}`;
+
+    navigate(searchUrl);
   };
 
   return (

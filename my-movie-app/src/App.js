@@ -69,18 +69,6 @@ function App() {
               <Route path="/people/:id" element={<PersonDetails />} />
               <Route path="/tv/:id" element={<TVShowDetails />} />
               <Route path="/user/:username" element={<UserProfile />} />
-
-              {/* <Route
-            path="/search"
-            element={
-              <SearchResults results={searchResults} type={searchType} />
-            }
-          /> */}
-              {/* <Route path="/" element={<Home searchResults={searchResults} />} />
-          <Route path="/movie/:id" element={<MovieDetails />} />
-          {searchResults.length > 0 && searchType === "person" && (
-            <Route path="/" element={<PeopleList people={searchResults} />} />
-          )} */}
             </Routes>
           </div>
         </Router>
