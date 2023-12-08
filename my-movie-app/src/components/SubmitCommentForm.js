@@ -14,6 +14,7 @@ function SubmitCommentForm({ movieId, onCommentSubmit }) {
     setIsSubmitting(true);
 
     if (!user || !user._id || !auth.token) {
+      alert("Please login to submit a comment.");
       console.error("User is not authenticated.");
       setIsSubmitting(false);
       return;

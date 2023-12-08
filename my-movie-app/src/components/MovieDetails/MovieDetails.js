@@ -69,6 +69,11 @@ function MovieDetails() {
 
   const handleRatingSubmit = async (rating) => {
     console.log("Submitting rating...", rating);
+    if (!user) {
+      alert("Please login to rate this movie.");
+      setShowRatingModal(false); // 关闭评分模态框
+      return;
+    }
     if (!user || !user._id || !auth.token) {
       console.error("User is not authenticated.");
       return;
@@ -136,6 +141,7 @@ function MovieDetails() {
   const addToWatchList = async () => {
     if (!user || !user._id || !auth.token) {
       console.error("User is not logged in or user data is incomplete.");
+      alert("Please login to add movies to your watchlist.");
       return;
     }
 
@@ -301,6 +307,11 @@ function MovieDetails() {
       token,
     });
 
+    if (!user) {
+      alert("Please login to submit a review.");
+      return;
+    }
+
     if (!movieId || !commentText || !userId || !token) {
       console.error("Missing parameters in handleCommentSubmit", {
         movieId,
@@ -356,52 +367,6 @@ function MovieDetails() {
     }
   };
 
-  // const handleCommentSubmit = async (movieId, commentText, userId, token) => {
-  //   console.log("handleCommentSubmit called with:", {
-  //     movieId,
-  //     commentText,
-  //     userId,
-  //     token,
-  //   });
-  //   console.log("Current user1204:", user);
-  //   console.log("User ID1204:", user?._id);
-
-  //   const requestData = {
-  //     movieId: id,
-  //     comment: commentText,
-  //     userId: user?._id,
-  //   };
-
-  //   console.log("Submitting comment with data:", requestData);
-
-  //   try {
-  //     console.log("Submitting comment...");
-  //     const response = await fetch(
-  //       `${process.env.REACT_APP_BASE_API_URL}/api/comments`,
-  //       {
-  //         method: "POST",
-  //         headers: {
-  //           "Content-Type": "application/json",
-  //           Authorization: `Bearer ${auth.token}`,
-  //         },
-  //         body: JSON.stringify(requestData),
-  //       }
-  //     );
-  //     console.log("Response status:", response.status);
-
-  //     if (response.ok) {
-  //       const newComment = await response.json();
-  //       setReviews([...reviews, newComment]);
-
-  //       console.log("Comment submitted successfully:", newComment);
-  //     } else {
-  //       console.error("Error submitting comment");
-  //     }
-  //   } catch (error) {
-  //     console.error("Error submitting comment:", error);
-  //   }
-  // };
-
   const handleDeleteComment = async (commentId) => {
     if (!window.confirm("Are you sure you want to delete this comment?")) {
       return;
@@ -419,6 +384,13 @@ function MovieDetails() {
     } catch (error) {
       console.error("Error deleting comment:", error);
       alert("Failed to delete comment");
+    }
+  };
+
+  const handleUserLinkClick = (event, username) => {
+    if (!user) {
+      event.preventDefault();
+      alert("Please login to view user profiles.");
     }
   };
 
@@ -546,6 +518,9 @@ function MovieDetails() {
               <h5 className="detail-card-title">
                 <Link
                   to={`/user/${review.userId.username}`}
+                  onClick={(e) =>
+                    handleUserLinkClick(e, review.userId.username)
+                  }
                   className="text-primary"
                 >
                   {review.userId.username}
@@ -562,14 +537,16 @@ function MovieDetails() {
                 </h6>
               )}
               <p className="detail-card-text">{review.comment}</p>
-              {(user._id === review.userId._id || user.role === "ADMIN") && (
-                <button
-                  onClick={() => handleDeleteComment(review._id)}
-                  className="delete-comment-btn"
-                >
-                  Delete Review
-                </button>
-              )}
+              {/* {(user._id === review.userId._id || user.role === "ADMIN") && ( */}
+              {user &&
+                (user._id === review.userId._id || user.role === "ADMIN") && (
+                  <button
+                    onClick={() => handleDeleteComment(review._id)}
+                    className="delete-comment-btn"
+                  >
+                    Delete Review
+                  </button>
+                )}
             </div>
           </div>
         ))}
@@ -593,5 +570,5 @@ function MovieDetails() {
   );
 }
 
-// export default MovieDetails;
-export default withAuth(MovieDetails);
+export default MovieDetails;
+// export default withAuth(MovieDetails);
