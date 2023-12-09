@@ -1,10 +1,12 @@
-import React from "react";
+import React, { useContext } from "react";
 import TrendingMovies from "./TrendingMovies";
 import PopularMovies from "./PopularMovies";
 import "bootstrap/dist/css/bootstrap.min.css";
 import UpcomingMovies from "./UpcomingMovies";
+import { AuthContext } from "../context/AuthContext";
 
 function Home() {
+  const { auth } = useContext(AuthContext);
   return (
     <div className="container mt-4">
       <div className="row mb-4">
@@ -13,11 +15,14 @@ function Home() {
           <TrendingMovies />
         </div>
       </div>
-      <div className="row mb-4">
-        <div className="col-12">
-          <UpcomingMovies />
+
+      {auth.user && (
+        <div className="row mb-4">
+          <div className="col-12">
+            <UpcomingMovies />
+          </div>
         </div>
-      </div>
+      )}
 
       <div className="row mb-4">
         <div className="col-12">
