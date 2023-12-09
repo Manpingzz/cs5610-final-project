@@ -78,10 +78,25 @@ export const searchTVShows = async (query) => {
     query
   )}`;
   const response = await fetch(url);
-  console.log("666 TV:", response);
   if (!response.ok) {
     throw new Error("Network response was not ok");
   }
   const data = await response.json();
   return data.results;
+};
+
+// upcoming movies
+export const fetchUpcomingMovies = async () => {
+  try {
+    const response = await fetch(
+      `${BASE_URL}/movie/upcoming?api_key=${API_KEY}`
+    );
+    console.log("response upcoming:", response);
+    if (!response.ok) {
+      throw new Error("Network response was not ok");
+    }
+    return await response.json();
+  } catch (error) {
+    console.error("Error fetching upcoming movies:", error);
+  }
 };
