@@ -19,10 +19,8 @@ export const signin = async (credentials) => {
   try {
     const response = await request.post(`${USERS_API}/signin`, credentials);
 
-    // 检查响应中是否有 JWT
     const { token } = response.data;
     if (token) {
-      // 保存 JWT 到 localStorage
       localStorage.setItem("jwtToken", token);
     } else {
       console.error("No token received");
@@ -41,9 +39,6 @@ export const signout = async () => {
 };
 
 export const signup = async (credentials) => {
-  // const response = await request.post(`${USERS_API}/signup`, credentials);
-  // return response.data;
-
   console.log("Sending signup request with credentials:", credentials);
   try {
     const response = await request.post(`${USERS_API}/signup`, credentials);
@@ -196,28 +191,9 @@ export const getUserComments = async (userId) => {
   }
 };
 
-// export const deleteComment = async (commentId) => {
-//   try {
-//     const token = localStorage.getItem("jwtToken");
-//     const response = await axios.delete(
-//       `${BASE_API}/api/comments/${commentId}`,
-//       {
-//         headers: {
-//           Authorization: `Bearer ${token}`, // 将 JWT 添加到请求头部
-//         },
-//       }
-//     );
-//     return response.data; // response.status === 200
-//   } catch (error) {
-//     console.error("Error deleting comment:", error);
-//     throw error;
-//   }
-// };
-
 export const deleteComment = async (commentId) => {
   try {
-    const token = localStorage.getItem("jwtToken"); // 从存储中获取 JWT
-    console.log("JWT from storage:", token); // 调试语句，检查 JWT
+    const token = localStorage.getItem("jwtToken");
 
     if (!token) {
       throw new Error("No token found");
@@ -227,7 +203,7 @@ export const deleteComment = async (commentId) => {
       `${BASE_API}/api/comments/${commentId}`,
       {
         headers: {
-          Authorization: `Bearer ${token}`, // 将 JWT 添加到请求头部
+          Authorization: `Bearer ${token}`,
         },
       }
     );

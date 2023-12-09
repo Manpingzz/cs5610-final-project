@@ -45,7 +45,7 @@ function MovieDetails() {
   const { auth, setAuth } = useContext(AuthContext);
   // const { auth } = useContext(AuthContext);
   useEffect(() => {
-    console.log("MovieDetails: 当前用户状态", auth);
+    console.log("MovieDetails: ", auth);
   }, [auth]);
   const user = auth.user;
   const [watchlist, setWatchlist] = useState([]);
@@ -71,7 +71,7 @@ function MovieDetails() {
     console.log("Submitting rating...", rating);
     if (!user) {
       alert("Please login to rate this movie.");
-      setShowRatingModal(false); // 关闭评分模态框
+      setShowRatingModal(false);
       return;
     }
     if (!user || !user._id || !auth.token) {
@@ -245,59 +245,6 @@ function MovieDetails() {
 
     fetchMovieDetails();
   }, [id]);
-
-  // const handleReviewSubmit = async (reviewData) => {
-  //   try {
-  //     const response = await client.createComment(reviewData);
-  //     console.log("Review submitted:", response);
-  //   } catch (error) {
-  //     console.error("Error submitting review:", error);
-  //   }
-  // };
-
-  // const handleCommentSubmit = async () => {
-  //   console.log("Submitting comment...");
-
-  //   if (!user || !user._id) {
-  //     console.error("User information is missing.");
-  //     return;
-  //   }
-
-  //   const requestData = {
-  //     movieId: id,
-  //     userId: user._id,
-  //     comment: commentText,
-  //   };
-
-  //   console.log("Submitting comment with data:", requestData);
-
-  //   try {
-  //     const response = await fetch(
-  //       `${process.env.REACT_APP_BASE_API_URL}/api/comments`,
-  //       {
-  //         method: "POST",
-  //         headers: {
-  //           "Content-Type": "application/json",
-  //           Authorization: `Bearer ${auth.token}`,
-  //         },
-  //         body: JSON.stringify(requestData),
-  //       }
-  //     );
-
-  //     if (response.ok) {
-  //       const newComment = await response.json();
-  //       setReviews([...reviews, newComment]);
-  //       console.log("Comment submitted successfully:", newComment);
-  //     } else {
-  //       console.error(
-  //         "Error submitting comment, response status:",
-  //         response.status
-  //       );
-  //     }
-  //   } catch (error) {
-  //     console.error("Error submitting comment:", error);
-  //   }
-  // };
 
   const handleCommentSubmit = async (movieId, commentText, userId, token) => {
     console.log("handleCommentSubmit called with:", {
@@ -571,4 +518,3 @@ function MovieDetails() {
 }
 
 export default MovieDetails;
-// export default withAuth(MovieDetails);

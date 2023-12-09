@@ -44,7 +44,7 @@ function Login() {
     try {
       const credentials = { username, password };
       const response = await client.signin(credentials);
-      console.log("user666:", response);
+
       if (response && response.token) {
         const { user, token } = response;
         setAuth({ user, token });
