@@ -45,6 +45,8 @@ function TVShowDetails() {
             <strong>Number of Seasons:</strong> {tvShow.number_of_seasons}
           </p>
           <br />
+          <br />
+          <p></p>
           <p>
             <strong>Overview:</strong> {tvShow.overview}
           </p>

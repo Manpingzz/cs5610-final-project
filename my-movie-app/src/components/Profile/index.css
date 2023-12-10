@@ -35,6 +35,8 @@
   transition: all 0.3s ease;
   border-radius: 8px;
   color: white;
+  margin-top: 3px;
+  margin-bottom: 3px;
 }
 
 .profile-tabs button:not(:last-child) {

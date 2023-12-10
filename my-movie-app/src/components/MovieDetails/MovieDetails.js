@@ -236,8 +236,6 @@ function MovieDetails() {
         }
         const reviewsData = await reviewsResponse.json();
         setReviews(reviewsData);
-
-        console.log("Reviews data:", reviewsData);
       } catch (error) {
         console.error("Error fetching reviews:", error);
       }
@@ -275,11 +273,7 @@ function MovieDetails() {
         comment: commentText,
         userId: userId,
       };
-      console.log("commentText:", commentText, "Type:", typeof commentText);
 
-      console.log("Preparing to submit comment with data:", requestData);
-
-      console.log("Submitting comment...");
       const response = await fetch(
         `${process.env.REACT_APP_BASE_API_URL}/api/comments`,
         {
@@ -292,13 +286,10 @@ function MovieDetails() {
         }
       );
 
-      console.log("Response status:", response.status);
-
       if (response.ok) {
         const newComment = await response.json();
         setReviews((prevReviews) => {
           const updatedReviews = [...prevReviews, newComment];
-          console.log("Updated reviews:", updatedReviews);
           return updatedReviews;
         });
       } else {
@@ -326,8 +317,6 @@ function MovieDetails() {
         (comment) => comment._id !== commentId
       );
       setReviews(updatedReviews);
-
-      console.log("Comment deleted successfully");
     } catch (error) {
       console.error("Error deleting comment:", error);
       alert("Failed to delete comment");
@@ -501,12 +490,10 @@ function MovieDetails() {
           <SubmitCommentForm
             movieId={id}
             onCommentSubmit={(responseData) => {
-              console.log("Response data:", responseData);
               const newComment = {
                 ...responseData,
                 user: { username: user.username, _id: user._id },
               };
-              console.log("New comment:", newComment);
               setReviews((prevReviews) => [...prevReviews, newComment]);
             }}
           />
