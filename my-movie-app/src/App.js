@@ -55,6 +55,7 @@ function App() {
                 path="/"
                 element={<Home searchResults={searchResults} />}
               />
+
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
               <Route path="/profile" element={<Profile />} />

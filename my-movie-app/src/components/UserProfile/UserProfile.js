@@ -7,6 +7,7 @@ import { Tab, Nav } from "react-bootstrap";
 
 function UserProfile() {
   const { username } = useParams();
+  const { auth } = useContext(AuthContext);
   const [userData, setUserData] = useState(null);
   const [userRatings, setUserRatings] = useState([]);
   const [userComments, setUserComments] = useState([]);
@@ -103,8 +104,8 @@ function UserProfile() {
           <Tab.Pane eventKey="ratings">
             <div className="ratings-section mt-3">
               <ul className="list-unstyled">
-                {userRatings.filter((rating) => rating.rating > 0).length >
-                0 ? (
+                {auth.token &&
+                userRatings.filter((rating) => rating.rating > 0).length > 0 ? (
                   userRatings
                     .filter((rating) => rating.rating > 0)
                     .map((rating, index) => (
@@ -140,7 +141,7 @@ function UserProfile() {
 
           <Tab.Pane eventKey="comments">
             <div className="comments-section mt-3">
-              {userComments.length > 0 ? (
+              {auth.token && userComments.length > 0 ? (
                 <ul className="user-comments-list">
                   {userComments
                     .filter(

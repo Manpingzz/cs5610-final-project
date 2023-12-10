@@ -465,15 +465,14 @@ function MovieDetails() {
               <h5 className="detail-card-title">
                 <Link
                   to={`/user/${review.userId.username}`}
-                  onClick={(e) =>
-                    handleUserLinkClick(e, review.userId.username)
-                  }
+                  // onClick={(e) =>
+                  //   handleUserLinkClick(e, review.userId.username)
+                  // }
                   className="text-primary"
                 >
                   {review.userId.username}
                   {review.userId.role === "CRITIC" && (
                     <span className="critic-badge">Critic</span>
-                    // <i className="fa fa-badge-critic"></i>
                   )}
                 </Link>
               </h5>
