@@ -429,17 +429,19 @@ function MovieDetails() {
         <div className="row flex-nowrap">
           {credits.cast?.map((actor) => (
             <div key={actor.cast_id} className="col">
-              <div className="card card-cast">
-                <img
-                  src={`https://image.tmdb.org/t/p/w185${actor.profile_path}`}
-                  alt={actor.name}
-                  className="card-img-top"
-                />
-                <div className="card-body">
-                  <h6 className="card-title">{actor.name}</h6>
-                  <p className="card-text">{actor.character}</p>
+              <Link to={`/people/${actor.id}`}>
+                <div className="card card-cast">
+                  <img
+                    src={`https://image.tmdb.org/t/p/w185${actor.profile_path}`}
+                    alt={actor.name}
+                    className="card-img-top"
+                  />
+                  <div className="card-body">
+                    <h6 className="card-title">{actor.name}</h6>
+                    <p className="card-text">{actor.character}</p>
+                  </div>
                 </div>
-              </div>
+              </Link>
             </div>
           ))}
         </div>

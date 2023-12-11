@@ -32,6 +32,7 @@ function PersonDetails() {
           throw new Error("Network response was not ok");
         }
         const data = await response.json();
+
         setPerson(data);
         setLoading(false);
       } catch (error) {
